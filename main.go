@@ -36,8 +36,7 @@ func main() {
         case val := <- summarizedScores:
           clients <- SSEMessage{"",val,"/eps"}
         case msg := <- detailUpdates:
-          dchanid := strings.Split(msg.channel, ".")[2]
-          dchan   := "/details/" + dchanid
+          dchan := "/details/" + strings.Split(msg.channel, ".")[2]
           clients <- SSEMessage{msg.channel,msg.data,dchan}
       }
     }
