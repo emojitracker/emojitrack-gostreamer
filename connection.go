@@ -46,7 +46,13 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 	//TODO: we should do the above in a clever way so we work on any path
 
 	log.Println("Connection to: ", reqchan)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	headers := w.Header()
+	headers.Set("Access-Control-Allow-Origin", "*")
+	headers.Set("Content-Type", "text/event-stream; charset=utf-8")
+	headers.Set("Cache-Control", "no-cache")
+	headers.Set("Connection", "keep-alive")
+	headers.Set("Server", "emojitrack-gostreamer")
 
 	c := &connection{ send: make(chan []byte, 256), w: w, channel: reqchan }
 
