@@ -12,9 +12,9 @@ type SSEMessage struct {
 
 func (msg SSEMessage) sseFormat() []byte {
 	if msg.event != "" {
-		return []byte(fmt.Sprintf("event:%v\ndata:%v\n\n", msg.event, string(msg.data)))
+		return []byte(fmt.Sprintf("event:%s\ndata:%s\n\n", msg.event, msg.data))
 	} else {
-		return []byte(fmt.Sprintf("data:%v\n\n", string(msg.data)))
+		return []byte(fmt.Sprintf("data:%s\n\n", msg.data))
 	}
 }
 
