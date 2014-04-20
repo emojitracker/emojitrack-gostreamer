@@ -45,7 +45,7 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 	reqchan := r.URL.Path[10:] //strip out the prepending /subscribe
 	//TODO: we should do the above in a clever way so we work on any path
 
-	log.Println("Connection to: ", reqchan)
+	log.Println("CONNECT\t", reqchan, "\t", r.RemoteAddr)
 
 	headers := w.Header()
 	headers.Set("Access-Control-Allow-Origin", "*")
@@ -58,7 +58,7 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 
 	h.register <- c
 	defer func() {
-		log.Println("Disconnection from: ", reqchan)
+		log.Println("DISCONNECT\t", reqchan, "\t", r.RemoteAddr)
 		h.unregister <- c
 	}()
 
