@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	"log"
-/*	."github.com/azer/debug"*/
+	."github.com/azer/debug"
 )
 
 type connection struct {
@@ -21,15 +21,23 @@ type connection struct {
 }
 
 func (c *connection) writer() {
-	// read as long as channel is open
-	for message := range c.send {
-		_, err := c.w.Write(message)
-		if err != nil {
-			break
+	cn := c.w.(http.CloseNotifier)
+	closer := cn.CloseNotify()
+
+	for {
+		select {
+			case message := <-c.send:
+				_, err := c.w.Write(message)
+				if err != nil {
+					break
+				}
+		    if f, ok := c.w.(http.Flusher); ok {
+		      f.Flush()
+		    }
+			case <-closer:
+				Debug("closer fired for conn")
+				return
 		}
-    if f, ok := c.w.(http.Flusher); ok {
-      f.Flush()
-    }
 	}
 }
 
