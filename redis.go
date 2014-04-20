@@ -62,7 +62,8 @@ func RedisGo() (<-chan string, <-chan RedisMsg) {
             //fmt.Printf("pattern: %s, channel: %s, data: %s\n", v.Pattern, v.Channel, v.Data)
             //detailUpdates <- RedisMsg{v.Channel, v.Data}
         case error:
-            fmt.Println("error")
+            fmt.Println("redis errored?@&*(#)akjd")
+            panic(v)
       }
     }
   }()
