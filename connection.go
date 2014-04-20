@@ -55,8 +55,8 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 	headers.Set("Server", "emojitrack-gostreamer")
 
 	c := &connection{ send: make(chan []byte, 256), w: w, channel: reqchan }
-
 	h.register <- c
+
 	defer func() {
 		log.Println("DISCONNECT\t", reqchan, "\t", r.RemoteAddr)
 		h.unregister <- c

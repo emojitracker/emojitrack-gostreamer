@@ -51,7 +51,7 @@ func (h *hub) run() {
 					select {
 					case c.send <- m.sseFormat():
 					default:
-						Debug("cant write to a connection, assuming it needs to be cleaned up")
+						Debug("cant pass to a connection send chan, buffer is full -- kill it with fire")
 						delete(h.connections, c)
 						close(c.send)
 						// go c.ws.Close()

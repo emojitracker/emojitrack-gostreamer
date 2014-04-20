@@ -8,24 +8,41 @@ import (
 )
 
 func main() {
-  // set up a connection pool to receive clients on
+  // set up a SSE connection pool to receive clients on
   clients := ConnectionManager()
 
   // get us some data
 /*  scoreUpdates := fakeRedisStream()*/
+  log.Println("Connecting to redis...")
   scoreUpdates, detailUpdates := RedisGo()
 
-  // create a channel of just the values from the RedisMsg for scoreupdates
-  // suitable to sending to my generic scorepacker
+  // fanout the scoreUpdates to two destinations
+  rawScoreUpdates := make(chan RedisMsg)
+  epsfeeder       := make(chan RedisMsg)
+  go func() {
+    for scoreUpdate := range scoreUpdates {
+      rawScoreUpdates <- scoreUpdate
+      epsfeeder <- scoreUpdate
+    }
+  }()
+
+  // Handle packing for epschan
+  /*
+     This first goroutine basically grabs out just the data field of a RedisMsg,
+     and converts it to a string, because that's what my generic scorepacker
+     function expects to receive (for now).
+
+     Then, we just pipe that chan into a ScorePacker.
+  */
   scoreVals := make(chan string)
   go func() {
     for {
-      msg := <- scoreUpdates
+      msg := <- epsfeeder
       scoreVals <- string(msg.data)
     }
   }()
   // then send it to that scorepacker
-  summarizedScores := ScorePacker(scoreVals, time.Duration(17*time.Millisecond))
+  epsScoreUpdates := ScorePacker(scoreVals, time.Duration(17*time.Millisecond))
 
   // goroutine to handle passing messages to the proper connection pool
   // TODO: ask someone smart about whether each of these should be their own
@@ -33,7 +50,9 @@ func main() {
   go func() {
     for {
       select {
-        case val := <- summarizedScores:
+        case msg := <- rawScoreUpdates:
+          clients <- SSEMessage{"",msg.data,"/raw"}
+        case val := <- epsScoreUpdates:
           clients <- SSEMessage{"",val,"/eps"}
         case msg := <- detailUpdates:
           dchan := "/details/" + strings.Split(msg.channel, ".")[2]
@@ -44,7 +63,7 @@ func main() {
 
   http.HandleFunc("/subscribe/", sseHandler)
   port := ":8001"
-  log.Println("Starting on port " + port)
+  log.Println("Starting server on port " + port)
   log.Println("HOLD ON TO YOUR BUTTS...")
   if err := http.ListenAndServe(":8001", nil); err != nil {
     log.Fatal("ListenAndServe:", err)
