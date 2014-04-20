@@ -47,13 +47,15 @@ func (h *hub) run() {
 			close(c.send)
 		case m := <-h.broadcast:
 			for c := range h.connections {
-				select {
-				case c.send <- m.sseFormat():
-				default:
-					Debug("cant write to a connection, assuming it needs to be cleaned up")
-					delete(h.connections, c)
-					close(c.send)
-/*					go c.ws.Close()*/
+				if m.channel == c.channel {
+					select {
+					case c.send <- m.sseFormat():
+					default:
+						Debug("cant write to a connection, assuming it needs to be cleaned up")
+						delete(h.connections, c)
+						close(c.send)
+						// go c.ws.Close()
+					}
 				}
 			}
 		}
