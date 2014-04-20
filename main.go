@@ -43,6 +43,9 @@ func main() {
   }()
 
   http.HandleFunc("/subscribe/", sseHandler)
+  port := ":8001"
+  log.Println("Starting on port " + port)
+  log.Println("HOLD ON TO YOUR BUTTS...")
   if err := http.ListenAndServe(":8001", nil); err != nil {
     log.Fatal("ListenAndServe:", err)
   }
