@@ -27,6 +27,9 @@ func main() {
   // then send it to that scorepacker
   summarizedScores := ScorePacker(scoreVals, time.Duration(17*time.Millisecond))
 
+  // goroutine to handle passing messages to the proper connection pool
+  // TODO: ask someone smart about whether each of these should be their own
+  // goroutine, since the select here is kinda pointless since we dont need branching
   go func() {
     for {
       select {
