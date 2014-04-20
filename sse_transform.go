@@ -10,11 +10,11 @@ type SSEMessage struct {
 	channel string
 }
 
-func (msg SSEMessage) sseFormat() string {
+func (msg SSEMessage) sseFormat() []byte {
 	if msg.event != "" {
-		return fmt.Sprintf("event:%v\ndata:%v\n\n", msg.event, string(msg.data))
+		return []byte(fmt.Sprintf("event:%v\ndata:%v\n\n", msg.event, string(msg.data)))
 	} else {
-		return fmt.Sprintf("data:%v\n\n", string(msg.data))
+		return []byte(fmt.Sprintf("data:%v\n\n", string(msg.data)))
 	}
 }
 

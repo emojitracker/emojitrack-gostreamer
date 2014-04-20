@@ -11,7 +11,7 @@ func ConnectionManager() chan SSEMessage {
 	go func() {
 		for {
 			msg := <-inputStream
-			h.broadcast <- []byte(msg.sseFormat())
+			h.broadcast <- msg
 		}
 	}()
 	return inputStream
@@ -21,7 +21,7 @@ type hub struct {
 	// Registered connections.
 	connections map[*connection]bool
 	// Inbound messages to propogate out.
-	broadcast chan []byte
+	broadcast chan SSEMessage
 	// Register requests from the connections.
 	register chan *connection
 	// Unregister requests from connections.
@@ -29,7 +29,7 @@ type hub struct {
 }
 
 var h = hub{
-	broadcast:   make(chan []byte),
+	broadcast:   make(chan SSEMessage),
 	register:    make(chan *connection),
 	unregister:  make(chan *connection),
 	connections: make(map[*connection]bool),
@@ -48,7 +48,7 @@ func (h *hub) run() {
 		case m := <-h.broadcast:
 			for c := range h.connections {
 				select {
-				case c.send <- m:
+				case c.send <- m.sseFormat():
 				default:
 					Debug("cant write to a connection, assuming it needs to be cleaned up")
 					delete(h.connections, c)

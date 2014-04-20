@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	"log"
-	."github.com/azer/debug"
+/*	."github.com/azer/debug"*/
 )
 
 type connection struct {
@@ -35,6 +35,8 @@ func (c *connection) writer() {
 
 func sseHandler(w http.ResponseWriter, r *http.Request) {
 	reqchan := r.URL.Path[10:] //strip out the prepending /subscribe
+	//TODO: we should do the above in a clever way so we work on any path
+
 	log.Println("Connection to: ", reqchan)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
@@ -42,7 +44,7 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 
 	h.register <- c
 	defer func() {
-		Debug("Disconnection")
+		log.Println("Disconnection from: ", reqchan)
 		h.unregister <- c
 	}()
 
