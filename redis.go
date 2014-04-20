@@ -28,7 +28,7 @@ type RedisMsg struct {
   data []byte
 }
 
-func RedisGo() (<-chan string, <-chan RedisMsg) {
+func RedisGo() (<-chan RedisMsg, <-chan RedisMsg) {
 
   /* connec to the redis server */
   server := os.Getenv("REDIS_URL")
@@ -43,9 +43,8 @@ func RedisGo() (<-chan string, <-chan RedisMsg) {
   }
 
   /* set up structures and channels to stream events out on */
-  scoreUpdates := make(chan string)
+  scoreUpdates := make(chan RedisMsg)
   detailUpdates := make(chan RedisMsg)
-
 
   /* subscribe to and handle streams */
   psc := redis.PubSubConn{c}
@@ -57,10 +56,10 @@ func RedisGo() (<-chan string, <-chan RedisMsg) {
       switch v := psc.Receive().(type) {
         case redis.Message:
             //fmt.Printf("%s: message: %s\n", v.Channel, v.Data)
-            scoreUpdates <- string(v.Data)
+            scoreUpdates <- RedisMsg{v.Channel, v.Data} //string(v.Data)
         case redis.PMessage:
             //fmt.Printf("pattern: %s, channel: %s, data: %s\n", v.Pattern, v.Channel, v.Data)
-            //detailUpdates <- RedisMsg{v.Channel, v.Data}
+            detailUpdates <- RedisMsg{v.Channel, v.Data}
         case error:
             fmt.Println("redis errored?@&*(#)akjd")
             panic(v)

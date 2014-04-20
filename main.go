@@ -4,20 +4,39 @@ import (
   "log"
   "time"
   "net/http"
+  "strings"
 )
 
 func main() {
-/*  scoreUpdates := fakeRedisStream()*/
-  scoreUpdates, _ := RedisGo()
+  // set up a connection pool to receive clients on
+  clients := ConnectionManager()
 
-  summarizedScores := ScorePacker(scoreUpdates, time.Duration(17*time.Millisecond))
-  epsClients := ConnectionManager()
+  // get us some data
+/*  scoreUpdates := fakeRedisStream()*/
+  scoreUpdates, detailUpdates := RedisGo()
+
+  // create a channel of just the values from the RedisMsg for scoreupdates
+  // suitable to sending to my generic scorepacker
+  scoreVals := make(chan string)
+  go func() {
+    for {
+      msg := <- scoreUpdates
+      scoreVals <- string(msg.data)
+    }
+  }()
+  // then send it to that scorepacker
+  summarizedScores := ScorePacker(scoreVals, time.Duration(17*time.Millisecond))
 
   go func() {
     for {
-      val := <- summarizedScores
-      epsClients <- SSEMessage{"",val,"/eps"}
-    /*    epsClients <- sseEncoder(summarizedScores)*/
+      select {
+        case val := <- summarizedScores:
+          clients <- SSEMessage{"",val,"/eps"}
+        case msg := <- detailUpdates:
+          dchanid := strings.Split(msg.channel, ".")[2]
+          dchan   := "/details/" + dchanid
+          clients <- SSEMessage{msg.channel,msg.data,dchan}
+      }
     }
   }()
 
