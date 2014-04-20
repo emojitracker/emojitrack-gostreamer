@@ -12,7 +12,6 @@ func main() {
   clients := ConnectionManager()
 
   // get us some data
-/*  scoreUpdates := fakeRedisStream()*/
   log.Println("Connecting to redis...")
   scoreUpdates, detailUpdates := RedisGo()
 
@@ -22,7 +21,7 @@ func main() {
   go func() {
     for scoreUpdate := range scoreUpdates {
       rawScoreUpdates <- scoreUpdate
-      epsfeeder <- scoreUpdate
+      epsfeeder       <- scoreUpdate
     }
   }()
 
@@ -35,19 +34,32 @@ func main() {
      Then, we just pipe that chan into a ScorePacker.
   */
   scoreVals := make(chan string)
+  epsScoreUpdates := ScorePacker(scoreVals, time.Duration(17*time.Millisecond))
   go func() {
-    for {
-      msg := <- epsfeeder
-      scoreVals <- string(msg.data)
+    for { scoreVals <- string((<-epsfeeder).data) }
+  }()
+
+  // goroutines to handle passing messages to the proper connection pool
+  // TODO: ask someone smart about whether each of these should be their own
+  // goroutine, since the select here was kinda pointless since we dont need branching
+  go func() {
+    for msg := range rawScoreUpdates {
+      clients <- SSEMessage{"",msg.data,"/raw"}
     }
   }()
-  // then send it to that scorepacker
-  epsScoreUpdates := ScorePacker(scoreVals, time.Duration(17*time.Millisecond))
-
-  // goroutine to handle passing messages to the proper connection pool
-  // TODO: ask someone smart about whether each of these should be their own
-  // goroutine, since the select here is kinda pointless since we dont need branching
   go func() {
+    for val := range epsScoreUpdates {
+      clients <- SSEMessage{"",val,"/eps"}
+    }
+  }()
+  go func() {
+    for msg := range detailUpdates {
+      dchan := "/details/" + strings.Split(msg.channel, ".")[2]
+      clients <- SSEMessage{msg.channel,msg.data,dchan}
+    }
+  }()
+
+/*  go func() {
     for {
       select {
         case msg := <- rawScoreUpdates:
@@ -59,8 +71,9 @@ func main() {
           clients <- SSEMessage{msg.channel,msg.data,dchan}
       }
     }
-  }()
+  }()*/
 
+  // share and enjoy
   http.HandleFunc("/subscribe/", sseHandler)
   port := ":8001"
   log.Println("Starting server on port " + port)
