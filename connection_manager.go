@@ -42,10 +42,10 @@ func (h *hub) run() {
 	for {
 		select {
 		case c := <-h.register:
-			Debug("new connection being registered")
+			Debug("new connection being registered for " + c.channel)
 			h.connections[c] = true
 		case c := <-h.unregister:
-			Debug("connection told us to unregister it")
+			Debug("connection told us to unregister for " + c.channel)
 			delete(h.connections, c)
 			close(c.send)
 		case m := <-h.broadcast:
