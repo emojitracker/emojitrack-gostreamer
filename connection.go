@@ -7,8 +7,7 @@ import (
 )
 
 type connection struct {
-	// The websocket connection.
-	/*    ws *websocket.Conn*/
+	// The HTTP connection.
 	w http.ResponseWriter
 
 	// Buffered channel of outbound messages.
@@ -21,18 +20,6 @@ type connection struct {
 	channel string
 }
 
-// no reading only writing!!!!
-/*func (c *connection) reader() {
-    for {
-        _, message, err := c.ws.ReadMessage()
-        if err != nil {
-            break
-        }
-        h.broadcast <- message
-    }
-    c.ws.Close()
-}*/
-
 func (c *connection) writer() {
 	// read as long as channel is open
 	for message := range c.send {
@@ -44,10 +31,6 @@ func (c *connection) writer() {
       f.Flush()
     }
 	}
-	// if chan closes (or out of send loop somehow?), try to flush before finish
-/*	if f, ok := c.w.(http.Flusher); ok {
-		f.Flush()
-	}*/
 }
 
 func sseHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,13 +39,12 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	c := &connection{ send: make(chan []byte, 256), w: w, channel: reqchan }
-	
+
 	h.register <- c
 	defer func() {
 		Debug("Disconnection")
 		h.unregister <- c
 	}()
-	/*    go c.writer()*/
-	/*    c.reader()*/
+
 	c.writer()
 }

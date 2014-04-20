@@ -1,8 +1,6 @@
 package main
 
 import (
-/*	"fmt"*/
-/*	"log"*/
 	."github.com/azer/debug"
 )
 
@@ -13,7 +11,6 @@ func ConnectionManager() chan SSEMessage {
 	go func() {
 		for {
 			msg := <-inputStream
-/*			fmt.Println(msg.sseFormat())*/
 			h.broadcast <- []byte(msg.sseFormat())
 		}
 	}()
@@ -52,7 +49,6 @@ func (h *hub) run() {
 			for c := range h.connections {
 				select {
 				case c.send <- m:
-/*					log.Printf("sent data to send channel for %v conns\n", len(h.connections))*/
 				default:
 					Debug("cant write to a connection, assuming it needs to be cleaned up")
 					delete(h.connections, c)
