@@ -14,10 +14,7 @@ type connection struct {
 	send chan []byte
 
 	// The conceptual "channel" the SSE client is requesting
-	/* Yeah, this is a namespace collision with the Go language,
-			But the ship has already sailed on that one since the API
-			for this has been long defined. */
-	channel string
+	namespace string
 }
 
 func (c *connection) writer() {
@@ -42,10 +39,10 @@ func (c *connection) writer() {
 }
 
 func sseHandler(w http.ResponseWriter, r *http.Request) {
-	reqchan := r.URL.Path[10:] //strip out the prepending /subscribe
+	namespace := r.URL.Path[10:] //strip out the prepending /subscribe
 	//TODO: we should do the above in a clever way so we work on any path
 
-	log.Println("CONNECT\t", reqchan, "\t", r.RemoteAddr)
+	log.Println("CONNECT\t", namespace, "\t", r.RemoteAddr)
 
 	headers := w.Header()
 	headers.Set("Access-Control-Allow-Origin", "*")
@@ -54,11 +51,11 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 	headers.Set("Connection", "keep-alive")
 	headers.Set("Server", "emojitrack-gostreamer")
 
-	c := &connection{ send: make(chan []byte, 256), w: w, channel: reqchan }
+	c := &connection{ send: make(chan []byte, 256), w: w, namespace: namespace }
 	h.register <- c
 
 	defer func() {
-		log.Println("DISCONNECT\t", reqchan, "\t", r.RemoteAddr)
+		log.Println("DISCONNECT\t", namespace, "\t", r.RemoteAddr)
 		h.unregister <- c
 	}()
 

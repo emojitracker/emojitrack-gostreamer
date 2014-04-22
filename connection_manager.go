@@ -39,15 +39,15 @@ func (h *hub) run() {
 	for {
 		select {
 		case c := <-h.register:
-			Debug("new connection being registered for " + c.channel)
+			Debug("new connection being registered for " + c.namespace)
 			h.connections[c] = true
 		case c := <-h.unregister:
-			Debug("connection told us to unregister for " + c.channel)
+			Debug("connection told us to unregister for " + c.namespace)
 			delete(h.connections, c)
 			close(c.send)
 		case m := <-h.broadcast:
 			for c := range h.connections {
-				if m.channel == c.channel {
+				if m.namespace == c.namespace {
 					select {
 					case c.send <- m.sseFormat():
 					default:

@@ -5,9 +5,9 @@ import (
 )
 
 type SSEMessage struct {
-	event   string
-	data    []byte
-	channel string
+	event     string
+	data      []byte
+	namespace string
 }
 
 func (msg SSEMessage) sseFormat() []byte {
