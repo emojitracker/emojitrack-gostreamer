@@ -2,27 +2,12 @@ package main
 
 import (
   "fmt"
-  "time"
-  "math/rand"
   "os"
   "github.com/garyburd/redigo/redis"
   _"github.com/joho/godotenv/autoload"
 )
 
-/* fake scoreUpdate stream just good enough to write code without wasting network connection */
-func fakeRedisStream() <-chan string {
-  c := make(chan string)
-  keys := []string{"AAAA", "BBBB", "CCCC", "DDDD"}
-  go func() {
-    for {
-      c <- keys[ rand.Intn(3) ]
-      time.Sleep(time.Duration(rand.Intn(50)) * time.Millisecond)
-    }
-  }()
-  return c
-}
-
-
+//TODO: maybe get rid of this and just use redis.Message if there is generic interface
 type RedisMsg struct {
   channel string
   data []byte
