@@ -18,28 +18,21 @@ type sseServer struct {
 
 // Creates a new sseServer and returns a reference to it.
 func SSEServer() *sseServer {
-	// channel to receive msgs to broadcast.
-	// we make here as bidirectional so we can read from it,
-	// but cast to write-only in public interface.
-	inputStream := make(chan SSEMessage)
 
 	// set up the public interface
-	var s = sseServer{
-		Broadcast: inputStream,
-	}
+	var s = sseServer{}
 
 	// start up our actual internal connection hub
-	s.hub = newHub()
-	go s.hub.run()
+	// which we keep in the server struct as private
+	var h = newHub()
+	s.hub = h
+	go h.run()
 
-	// receive msgs to broadcast out to hub
-	go func() {
-		for {
-			s.hub.broadcast <- <-inputStream
-		}
-	}()
+	// expose just the broadcast chanel to public
+	// will be typecast to send-only
+	s.Broadcast = h.broadcast
 
-	// return channel for incoming msgs
+	// return handle
 	return &s
 }
 
