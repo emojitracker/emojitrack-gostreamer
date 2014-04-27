@@ -18,14 +18,10 @@ func ConnectionManager() chan SSEMessage {
 }
 
 type hub struct {
-	// Registered connections.
-	connections map[*connection]bool
-	// Inbound messages to propogate out.
-	broadcast chan SSEMessage
-	// Register requests from the connections.
-	register chan *connection
-	// Unregister requests from connections.
-	unregister chan *connection
+	connections map[*connection]bool // Registered connections.
+	broadcast chan SSEMessage 			 // Inbound messages to propogate out.
+	register chan *connection 			 // Register requests from the connections.
+	unregister chan *connection 		 // Unregister requests from connections.
 }
 
 var h = hub{
