@@ -3,17 +3,17 @@ package main
 import (
   "log"
   "time"
-  "net/http"
   "strings"
 )
 
 func main() {
-  // set up a SSE connection pool to receive clients on
-  clients := ConnectionManager()
-
   // get us some data
   log.Println("Connecting to redis...")
   scoreUpdates, detailUpdates := RedisGo()
+
+  // set up SSE server interface
+  s := SSEServer()
+  clients := s.broadcast
 
   // fanout the scoreUpdates to two destinations
   rawScoreUpdates := make(chan RedisMsg)
@@ -74,14 +74,12 @@ func main() {
   }()*/
 
   // share and enjoy
-  http.HandleFunc("/subscribe/", sseHandler)
   port := ":8001"
   log.Println("Starting server on port " + port)
   log.Println("HOLD ON TO YOUR BUTTS...")
-  if err := http.ListenAndServe(":8001", nil); err != nil {
-    log.Fatal("ListenAndServe:", err)
-  }
 
+  // this method blocks by design
+  s.Serve(port)
 }
 
 /*
@@ -107,4 +105,6 @@ func main() {
   accumulator gofunc for reading status msgs from each chan
   emit on ticker to redis write...
 
+  OR, a crazy DRY way to handle redis reporting...
+    ...just HTTP hit localhost node for status, haha!
 */
