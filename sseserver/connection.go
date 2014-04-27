@@ -7,14 +7,9 @@ import (
 )
 
 type connection struct {
-	// The HTTP connection.
-	w http.ResponseWriter
-
-	// Buffered channel of outbound messages.
-	send chan []byte
-
-	// The conceptual "channel" the SSE client is requesting
-	namespace string
+	w         http.ResponseWriter // The HTTP connection
+	send      chan []byte         // Buffered channel of outbound messages.
+	namespace string              // Conceptual "channel" SSE client is requesting
 }
 
 func (c *connection) writer() {
@@ -39,8 +34,8 @@ func (c *connection) writer() {
 }
 
 func sseHandler(w http.ResponseWriter, r *http.Request) {
-	namespace := r.URL.Path[10:] //strip out the prepending /subscribe
-	//TODO: we should do the above in a clever way so we work on any path
+	namespace := r.URL.Path[10:] // strip out the prepending "/subscribe"
+	// TODO: we should do the above in a clever way so we work on any path
 
 	log.Println("CONNECT\t", namespace, "\t", r.RemoteAddr)
 
