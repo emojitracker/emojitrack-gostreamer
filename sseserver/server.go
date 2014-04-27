@@ -13,6 +13,7 @@ import (
 // that matches the message.
 type sseServer struct {
 	Broadcast chan<- SSEMessage
+	hub       *hub
 }
 
 // Creates a new sseServer and returns a reference to it.
@@ -28,12 +29,13 @@ func SSEServer() *sseServer {
 	}
 
 	// start up our actual internal connection hub
-	go h.run()
+	s.hub = newHub()
+	go s.hub.run()
 
 	// receive msgs to broadcast out to hub
 	go func() {
 		for {
-			h.broadcast <- <-inputStream
+			s.hub.broadcast <- <-inputStream
 		}
 	}()
 
@@ -45,7 +47,11 @@ func SSEServer() *sseServer {
 // This method blocks forever, as it's basically a setup wrapper around
 // `http.ListenAndServe()`
 func (s *sseServer) Serve(addr string) {
-	http.HandleFunc("/subscribe/", sseHandler)
+	// use anonymous function for closure in order to pass value to handler
+	// https://groups.google.com/forum/#!topic/golang-nuts/SGn1gd290zI
+	http.HandleFunc("/subscribe/", func(w http.ResponseWriter, r *http.Request) {
+		sseHandler(w, r, s.hub)
+	})
 
 	Debug("Starting server on addr " + addr)
 	if err := http.ListenAndServe(addr, nil); err != nil {

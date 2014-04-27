@@ -11,11 +11,13 @@ type hub struct {
 	unregister  chan *connection     // Unregister requests from connections.
 }
 
-var h = hub{
-	broadcast:   make(chan SSEMessage),
-	register:    make(chan *connection),
-	unregister:  make(chan *connection),
-	connections: make(map[*connection]bool),
+func newHub() *hub {
+	return &hub{
+		broadcast:   make(chan SSEMessage),
+		register:    make(chan *connection),
+		unregister:  make(chan *connection),
+		connections: make(map[*connection]bool),
+	}
 }
 
 func (h *hub) run() {

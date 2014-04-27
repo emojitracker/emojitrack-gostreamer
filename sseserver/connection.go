@@ -33,7 +33,7 @@ func (c *connection) writer() {
 	}
 }
 
-func sseHandler(w http.ResponseWriter, r *http.Request) {
+func sseHandler(w http.ResponseWriter, r *http.Request, h *hub) {
 	namespace := r.URL.Path[10:] // strip out the prepending "/subscribe"
 	// TODO: we should do the above in a clever way so we work on any path
 
