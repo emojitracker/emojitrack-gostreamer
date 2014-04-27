@@ -1,9 +1,9 @@
 package sseserver
 
 import (
-	"net/http"
+	. "github.com/azer/debug"
 	"log"
-	."github.com/azer/debug"
+	"net/http"
 )
 
 type connection struct {
@@ -23,17 +23,17 @@ func (c *connection) writer() {
 
 	for {
 		select {
-			case message := <-c.send:
-				_, err := c.w.Write(message)
-				if err != nil {
-					break
-				}
-		    if f, ok := c.w.(http.Flusher); ok {
-		      f.Flush()
-		    }
-			case <-closer:
-				Debug("closer fired for conn")
-				return
+		case message := <-c.send:
+			_, err := c.w.Write(message)
+			if err != nil {
+				break
+			}
+			if f, ok := c.w.(http.Flusher); ok {
+				f.Flush()
+			}
+		case <-closer:
+			Debug("closer fired for conn")
+			return
 		}
 	}
 }
@@ -51,7 +51,7 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 	headers.Set("Connection", "keep-alive")
 	headers.Set("Server", "emojitrack-gostreamer")
 
-	c := &connection{ send: make(chan []byte, 256), w: w, namespace: namespace }
+	c := &connection{send: make(chan []byte, 256), w: w, namespace: namespace}
 	h.register <- c
 
 	defer func() {

@@ -1,7 +1,7 @@
 package sseserver
 
 import (
-  "fmt"
+	"fmt"
 )
 
 type SSEMessage struct {

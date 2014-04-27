@@ -1,14 +1,14 @@
 package sseserver
 
 import (
-	."github.com/azer/debug"
+	. "github.com/azer/debug"
 )
 
 type hub struct {
 	connections map[*connection]bool // Registered connections.
-	broadcast chan SSEMessage 			 // Inbound messages to propogate out.
-	register chan *connection 			 // Register requests from the connections.
-	unregister chan *connection 		 // Unregister requests from connections.
+	broadcast   chan SSEMessage      // Inbound messages to propogate out.
+	register    chan *connection     // Register requests from the connections.
+	unregister  chan *connection     // Unregister requests from connections.
 }
 
 var h = hub{
@@ -39,12 +39,12 @@ func (h *hub) run() {
 						close(c.send)
 						// go c.ws.Close()
 						/* TODO: figure out what to do here...
-							 we are already closing the send channel, in *theory* shouldn't the
-							 connection clean up? I guess possible it doesnt if its deadlocked or
-							 something... is it?
+						we are already closing the send channel, in *theory* shouldn't the
+						connection clean up? I guess possible it doesnt if its deadlocked or
+						something... is it?
 
-							 we want to make sure to always close the HTTP connection though,
-							 so server can never fill up max num of open sockets.
+						we want to make sure to always close the HTTP connection though,
+						so server can never fill up max num of open sockets.
 						*/
 					}
 				}
