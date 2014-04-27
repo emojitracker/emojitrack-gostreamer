@@ -4,6 +4,7 @@ import (
   "log"
   "time"
   "strings"
+  "./sseserver"
 )
 
 func main() {
@@ -12,8 +13,8 @@ func main() {
   scoreUpdates, detailUpdates := RedisGo()
 
   // set up SSE server interface
-  s := SSEServer()
-  clients := s.broadcast
+  s := sseserver.SSEServer()
+  clients := s.Broadcast
 
   // fanout the scoreUpdates to two destinations
   rawScoreUpdates := make(chan RedisMsg)
@@ -44,18 +45,18 @@ func main() {
   // goroutine, since the select here was kinda pointless since we dont need branching
   go func() {
     for msg := range rawScoreUpdates {
-      clients <- SSEMessage{"",msg.data,"/raw"}
+      clients <- sseserver.SSEMessage{"",msg.data,"/raw"}
     }
   }()
   go func() {
     for val := range epsScoreUpdates {
-      clients <- SSEMessage{"",val,"/eps"}
+      clients <- sseserver.SSEMessage{"",val,"/eps"}
     }
   }()
   go func() {
     for msg := range detailUpdates {
       dchan := "/details/" + strings.Split(msg.channel, ".")[2]
-      clients <- SSEMessage{msg.channel,msg.data,dchan}
+      clients <- sseserver.SSEMessage{msg.channel,msg.data,dchan}
     }
   }()
 

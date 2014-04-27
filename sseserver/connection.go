@@ -1,4 +1,4 @@
-package main
+package sseserver
 
 import (
 	"net/http"

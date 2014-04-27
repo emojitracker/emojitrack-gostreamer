@@ -1,4 +1,4 @@
-package main
+package sseserver
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ import (
 // will be broadcast out to any connected clients subscribed to a namespace
 // that matches the message.
 type sseServer struct {
-	broadcast chan<- SSEMessage
+	Broadcast chan<- SSEMessage
 }
 
 // Creates a new sseServer and returns a reference to it.
@@ -27,7 +27,7 @@ func SSEServer() *sseServer {
 
 	// set up the public interface
 	var s = sseServer{
-		broadcast: inputStream,
+		Broadcast: inputStream,
 	}
 
 	// start up our actual internal connection hub
@@ -86,7 +86,7 @@ func (h *hub) run() {
 			close(c.send)
 		case m := <-h.broadcast:
 			for c := range h.connections {
-				if m.namespace == c.namespace {
+				if m.Namespace == c.namespace {
 					select {
 					case c.send <- m.sseFormat():
 					default:
