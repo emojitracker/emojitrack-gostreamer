@@ -5,8 +5,8 @@ import (
 )
 
 type hub struct {
-	connections map[*connection]bool // Registered connections.
 	broadcast   chan SSEMessage      // Inbound messages to propogate out.
+	connections map[*connection]bool // Registered connections.
 	register    chan *connection     // Register requests from the connections.
 	unregister  chan *connection     // Unregister requests from connections.
 }
@@ -14,9 +14,9 @@ type hub struct {
 func newHub() *hub {
 	return &hub{
 		broadcast:   make(chan SSEMessage),
+		connections: make(map[*connection]bool),
 		register:    make(chan *connection),
 		unregister:  make(chan *connection),
-		connections: make(map[*connection]bool),
 	}
 }
 
