@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./sseserver"
+	"github.com/mroth/emojitrack-gostreamer/sseserver"
 	"log"
 	"strings"
 	"time"
@@ -47,18 +47,31 @@ func main() {
 	// goroutine, since the select here was kinda pointless since we dont need branching
 	go func() {
 		for msg := range rawScoreUpdates {
-			clients <- sseserver.SSEMessage{"", msg.data, "/raw"}
+			clients <- sseserver.SSEMessage{
+				Event:     "",
+				Data:      msg.data,
+				Namespace: "/raw",
+			}
 		}
 	}()
 	go func() {
 		for val := range epsScoreUpdates {
-			clients <- sseserver.SSEMessage{"", val, "/eps"}
+			clients <- sseserver.SSEMessage{
+				Event:     "",
+				Data:      val,
+				Namespace: "/eps",
+			}
 		}
 	}()
 	go func() {
 		for msg := range detailUpdates {
 			dchan := "/details/" + strings.Split(msg.channel, ".")[2]
-			clients <- sseserver.SSEMessage{msg.channel, msg.data, dchan}
+
+			clients <- sseserver.SSEMessage{
+				Event:     msg.channel,
+				Data:      msg.data,
+				Namespace: dchan,
+			}
 		}
 	}()
 
