@@ -4,12 +4,33 @@ import (
 	. "github.com/azer/debug"
 	"log"
 	"net/http"
+	"time"
 )
 
 type connection struct {
-	w         http.ResponseWriter // The HTTP connection
-	send      chan []byte         // Buffered channel of outbound messages.
+	r         *http.Request       // The HTTP request
+	w         http.ResponseWriter // The HTTP response
+	created   time.Time           // Timestamp for when connection was opened
+	send      chan []byte         // Buffered channel of outbound messages
 	namespace string              // Conceptual "channel" SSE client is requesting
+}
+
+type connectionStatus struct {
+	Path      string `json:"request_path"`
+	Namespace string `json:"namespace"`
+	Created   int64  `json:"created_at"`
+	ClientIP  string `json:"client_ip"`
+	UserAgent string `json:"user_agent"`
+}
+
+func (c *connection) Status() connectionStatus {
+	return connectionStatus{
+		Path:      c.r.URL.Path,
+		Namespace: c.namespace,
+		Created:   c.created.Unix(),
+		ClientIP:  c.r.RemoteAddr,
+		UserAgent: c.r.UserAgent(),
+	}
 }
 
 func (c *connection) writer() {
@@ -46,7 +67,13 @@ func sseHandler(w http.ResponseWriter, r *http.Request, h *hub) {
 	headers.Set("Connection", "keep-alive")
 	headers.Set("Server", "emojitrack-gostreamer")
 
-	c := &connection{send: make(chan []byte, 256), w: w, namespace: namespace}
+	c := &connection{
+		send:      make(chan []byte, 256),
+		w:         w,
+		r:         r,
+		created:   time.Now(),
+		namespace: namespace,
+	}
 	h.register <- c
 
 	defer func() {

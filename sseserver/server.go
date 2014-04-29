@@ -46,6 +46,10 @@ func (s *sseServer) Serve(addr string) {
 		sseHandler(w, r, s.hub)
 	})
 
+	http.HandleFunc("/admin/status.json", func(w http.ResponseWriter, r *http.Request) {
+		adminHandler(w, r, s.hub)
+	})
+
 	Debug("Starting server on addr " + addr)
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
