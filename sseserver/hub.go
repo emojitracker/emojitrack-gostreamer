@@ -30,11 +30,11 @@ func (h *hub) run() {
 			Debug("connection told us to unregister for " + c.namespace)
 			delete(h.connections, c)
 			close(c.send)
-		case m := <-h.broadcast:
+		case msg := <-h.broadcast:
 			for c := range h.connections {
-				if m.Namespace == c.namespace {
+				if msg.Namespace == c.namespace {
 					select {
-					case c.send <- m.sseFormat():
+					case c.send <- msg.sseFormat():
 					default:
 						Debug("cant pass to a connection send chan, buffer is full -- kill it with fire")
 						delete(h.connections, c)
