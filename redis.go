@@ -76,9 +76,11 @@ func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
 				detailUpdates <- RedisMsg{v.Channel, v.Data}
 			case error:
 				fmt.Println("redis subscribe connection errored?@&*(#)akjd")
-				fmt.Println("closing redis connection")
+				// probable cause is connection was closed, but force close just in case
 				conn.Close()
-				fmt.Println("attempting to get a new one")
+
+				fmt.Println("attempting to get a new one in 5 seconds...")
+				time.Sleep(5 * time.Second)
 				conn = redisPool.Get()
 			}
 		}
