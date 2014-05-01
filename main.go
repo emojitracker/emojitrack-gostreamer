@@ -14,7 +14,7 @@ func main() {
 	clients := s.Broadcast
 
 	// get us some data from redis
-	log.Println("Connecting to redis...")
+	log.Println("Connecting to Redis...")
 	initRedisPool()
 	scoreUpdates, detailUpdates := myRedisSubscriptions()
 
