@@ -6,8 +6,15 @@ import (
 	"time"
 )
 
-// TODO: maybe get rid of this and just use redis.Message if there is generic interface
-// sigh golang...: https://github.com/garyburd/redigo/issues/51
+// it'd be nice to get rid of this and just use redis.Message generic interface
+// ...but sigh Go: https://github.com/garyburd/redigo/issues/51
+//
+// let's just keep this and warp, even though there is some slight copy overhead
+// probably, but it's better than having to have to have the rest of the code
+// differentiate between structs based on where they originated.
+
+// RedisMsg is our wrapper around redis.Message and redis.PMessage, since they
+// really should be the same.
 type RedisMsg struct {
 	channel string
 	data    []byte
