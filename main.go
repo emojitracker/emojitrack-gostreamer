@@ -9,9 +9,10 @@ import (
 )
 
 func main() {
-	// get us some data
+	// get us some data from redis
 	log.Println("Connecting to redis...")
-	scoreUpdates, detailUpdates := RedisGo()
+	initRedisPool()
+	scoreUpdates, detailUpdates := myRedisSubscriptions()
 
 	// set up SSE server interface
 	s := sseserver.NewServer()
