@@ -83,7 +83,8 @@ func main() {
 	}()
 
 	// start the monitor reporter to periodically send our status to redis
-	go reporter(s)
+	go adminReporter(s)
+	gorelicMonitor()
 
 	// share and enjoy
 	port := envPort()
