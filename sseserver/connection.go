@@ -39,8 +39,8 @@ func (c *connection) writer() {
 
 	for {
 		select {
-		case message := <-c.send:
-			_, err := c.w.Write(message)
+		case msg := <-c.send:
+			_, err := c.w.Write(msg)
 			if err != nil {
 				break
 			}

@@ -40,7 +40,9 @@ func SSEServer() *sseServer {
 // This method blocks forever, as it's basically a setup wrapper around
 // `http.ListenAndServe()`
 func (s *sseServer) Serve(addr string) {
-	// use anonymous function for closure in order to pass value to handler
+
+	// set up routes.
+	// use an anonymous function for closure in order to pass value to handler
 	// https://groups.google.com/forum/#!topic/golang-nuts/SGn1gd290zI
 	http.HandleFunc("/subscribe/", func(w http.ResponseWriter, r *http.Request) {
 		sseHandler(w, r, s.hub)
@@ -50,6 +52,7 @@ func (s *sseServer) Serve(addr string) {
 		adminHandler(w, r, s.hub)
 	})
 
+	// actually start the HTTP server
 	Debug("Starting server on addr " + addr)
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)

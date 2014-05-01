@@ -4,6 +4,10 @@ import (
 	. "github.com/azer/debug"
 )
 
+// A connection hub keeps track of all the active client connections, and
+// handles broadcasting messages out to those connections that match the
+// appropriate namespace.
+
 type hub struct {
 	broadcast   chan SSEMessage      // Inbound messages to propogate out.
 	connections map[*connection]bool // Registered connections.
