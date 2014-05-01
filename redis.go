@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"time"
@@ -83,11 +82,11 @@ func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
 				//TODO: at some point we might need to also match the pattern here for kiosk mode
 				detailUpdates <- RedisMsg{v.Channel, v.Data}
 			case error:
-				fmt.Println("redis subscribe connection errored?@&*(#)akjd")
+				log.Println("redis subscribe connection errored?@&*(#)akjd")
 				// probable cause is connection was closed, but force close just in case
 				conn.Close()
 
-				fmt.Println("attempting to get a new one in 5 seconds...")
+				log.Println("attempting to get a new one in 5 seconds...")
 				time.Sleep(5 * time.Second)
 				conn = redisPool.Get()
 			}
