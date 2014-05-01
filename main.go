@@ -9,14 +9,14 @@ import (
 )
 
 func main() {
+	// set up SSE server interface
+	s := sseserver.NewServer()
+	clients := s.Broadcast
+
 	// get us some data from redis
 	log.Println("Connecting to redis...")
 	initRedisPool()
 	scoreUpdates, detailUpdates := myRedisSubscriptions()
-
-	// set up SSE server interface
-	s := sseserver.NewServer()
-	clients := s.Broadcast
 
 	// fanout the scoreUpdates to two destinations
 	rawScoreUpdates := make(chan RedisMsg)
@@ -28,14 +28,13 @@ func main() {
 		}
 	}()
 
-	// Handle packing for epschan
-	/*
-	   This first goroutine basically grabs out just the data field of a RedisMsg,
-	   and converts it to a string, because that's what my generic scorepacker
-	   function expects to receive (for now).
-
-	   Then, we just pipe that chan into a ScorePacker.
-	*/
+	// Handle packing scores for eps namespace.
+	//
+	// This first goroutine basically grabs just the data field of a Redis msg,
+	// and converts it to a string, because that's what my generic scorepacker
+	// function expects to receive.
+	//
+	// Then, we just pipe that chan into a ScorePacker.
 	scoreVals := make(chan string)
 	epsScoreUpdates := ScorePacker(scoreVals, time.Duration(17*time.Millisecond))
 	go func() {
@@ -44,9 +43,13 @@ func main() {
 		}
 	}()
 
-	// goroutines to handle passing messages to the proper connection pool
-	// TODO: ask someone smart about whether each of these should be their own
-	// goroutine, since the select here was kinda pointless since we dont need branching
+	// goroutines to handle passing messages to the proper connection pool.
+	//
+	// I could use a select here and do as one goroutine, but having each be
+	// independent could be slightly better for concurrency as these actually do
+	// have a small amount of overhead in creating the SSEMessage so this is
+	// theoretically better if we are running in parallel on appropriate hardware.
+
 	go func() {
 		for msg := range rawScoreUpdates {
 			clients <- sseserver.SSEMessage{
@@ -56,6 +59,7 @@ func main() {
 			}
 		}
 	}()
+
 	go func() {
 		for val := range epsScoreUpdates {
 			clients <- sseserver.SSEMessage{
@@ -65,6 +69,7 @@ func main() {
 			}
 		}
 	}()
+
 	go func() {
 		for msg := range detailUpdates {
 			dchan := "/details/" + strings.Split(msg.channel, ".")[2]
@@ -77,20 +82,6 @@ func main() {
 		}
 	}()
 
-	/*  go func() {
-	    for {
-	      select {
-	        case msg := <- rawScoreUpdates:
-	          clients <- SSEMessage{"",msg.data,"/raw"}
-	        case val := <- epsScoreUpdates:
-	          clients <- SSEMessage{"",val,"/eps"}
-	        case msg := <- detailUpdates:
-	          dchan := "/details/" + strings.Split(msg.channel, ".")[2]
-	          clients <- SSEMessage{msg.channel,msg.data,dchan}
-	      }
-	    }
-	  }()*/
-
 	// start the monitor reporter to periodically send our status to redis
 	go reporter(s)
 
@@ -102,30 +93,3 @@ func main() {
 	// this method blocks by design
 	s.Serve(port)
 }
-
-/*
-  general patterns.
-
-  redis -> chan scoreupdates
-        -> chan detailstream
-
-  *scoreupdates -> scorepacker -> chan epsstream
-                -> chan rawstream
-
-  *rawstream -> raw_pool => N clients
-  *epsstream -> eps_pool => N clients
-  *detailstream -> detail_pool => 4 clients for foo
-                               -> 1 client  for bar
-                               => 7 clients for xxx
-
-  ^^^^ somehow buffered??
-
-  status messages emitted from each pool on timer
-  chan  <- raw_pool
-
-  accumulator gofunc for reading status msgs from each chan
-  emit on ticker to redis write...
-
-  OR, a crazy DRY way to handle redis reporting...
-    ...just HTTP hit localhost node for status, haha!
-*/
