@@ -86,7 +86,7 @@ func main() {
 	go reporter(s)
 
 	// share and enjoy
-	port := ":8001"
+	port := envPort()
 	log.Println("Starting server on port " + port)
 	log.Println("HOLD ON TO YOUR BUTTS...")
 

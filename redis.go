@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
-	_ "github.com/joho/godotenv/autoload"
-	"os"
 	"time"
 )
 
@@ -47,9 +45,8 @@ var (
 )
 
 func initRedisPool() {
-	server := os.Getenv("REDIS_URL")
-	pass := os.Getenv("REDIS_PASS")
-	redisPool = newPool(server, pass)
+	host, pass := envRedis()
+	redisPool = newPool(host, pass)
 }
 
 func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
