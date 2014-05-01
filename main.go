@@ -90,6 +90,9 @@ func main() {
 	    }
 	  }()*/
 
+	// start the monitor reporter to periodically send our status to redis
+	go reporter(s)
+
 	// share and enjoy
 	port := ":8001"
 	log.Println("Starting server on port " + port)
