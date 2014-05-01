@@ -15,7 +15,17 @@ type hubStatus struct {
 	Connections []connectionStatus `json:"connections"`
 }
 
-// Status returns the status struct for a given connection hub
+// Status returns the status struct for a given server.
+// This mirrors what is made available on the `/admin/status.json` endpoint.
+//
+// Mostly useful for reporting.
+func (s *Server) Status() hubStatus {
+	return s.hub.Status()
+}
+
+// Status returns the status struct for a given connection hub.
+// This hub is the real source of truth and Server is just a wrapper but people
+// don't know that...
 func (h *hub) Status() hubStatus {
 
 	stat := hubStatus{
