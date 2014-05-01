@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/mroth/emojitrack-gostreamer/sseserver"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/mroth/emojitrack-gostreamer/sseserver"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 	scoreUpdates, detailUpdates := RedisGo()
 
 	// set up SSE server interface
-	s := sseserver.SSEServer()
+	s := sseserver.NewServer()
 	clients := s.Broadcast
 
 	// fanout the scoreUpdates to two destinations

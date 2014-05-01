@@ -11,17 +11,17 @@ import (
 // Exposes a send-only chan `broadcast`, any SSEMessage sent to this channel
 // will be broadcast out to any connected clients subscribed to a namespace
 // that matches the message.
-type sseServer struct {
+type Server struct {
 	Broadcast chan<- SSEMessage
 	Status    hubStatus
 	hub       *hub
 }
 
 // Creates a new sseServer and returns a reference to it.
-func SSEServer() *sseServer {
+func NewServer() *Server {
 
 	// set up the public interface
-	var s = sseServer{}
+	var s = Server{}
 
 	// start up our actual internal connection hub
 	// which we keep in the server struct as private
@@ -40,7 +40,7 @@ func SSEServer() *sseServer {
 // Begin serving SSE connections on specified addr.
 // This method blocks forever, as it's basically a setup wrapper around
 // `http.ListenAndServe()`
-func (s *sseServer) Serve(addr string) {
+func (s *Server) Serve(addr string) {
 
 	// set up routes.
 	// use an anonymous function for closure in order to pass value to handler
