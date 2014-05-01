@@ -13,6 +13,7 @@ import (
 // that matches the message.
 type sseServer struct {
 	Broadcast chan<- SSEMessage
+	Status    hubStatus
 	hub       *hub
 }
 

@@ -8,17 +8,17 @@ import (
 	"time"
 )
 
-type status struct {
+type hubStatus struct {
 	Node        string             `json:"node"`
 	Status      string             `json:"status"`
 	Reported    int64              `json:"reported_at"`
 	Connections []connectionStatus `json:"connections"`
 }
 
-// add a statusReport to hub type
-func (h *hub) statusReport() string {
+// Status returns the status struct for a given connection hub
+func (h *hub) Status() hubStatus {
 
-	stat := status{
+	stat := hubStatus{
 		Node:     fmt.Sprintf("%s-%s-%s", platform(), env(), dyno()),
 		Status:   "OK",
 		Reported: time.Now().Unix(),
@@ -29,8 +29,7 @@ func (h *hub) statusReport() string {
 		stat.Connections = append(stat.Connections, k.Status())
 	}
 
-	b, _ := json.MarshalIndent(stat, "", "  ")
-	return string(b)
+	return stat
 }
 
 func platform() string {
@@ -57,6 +56,7 @@ func env() string {
 
 func adminHandler(w http.ResponseWriter, r *http.Request, h *hub) {
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(w, h.statusReport())
+	b, _ := json.MarshalIndent(h.Status(), "", "  ")
+	fmt.Fprint(w, string(b))
 	return
 }
