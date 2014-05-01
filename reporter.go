@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"time"
 
 	"github.com/mroth/emojitrack-gostreamer/sseserver"
@@ -10,10 +10,18 @@ import (
 func reporter(s *sseserver.Server) {
 	ticker := time.NewTicker(5 * time.Second)
 	for {
+		// block waiting for ticker
 		<-ticker.C
-		fmt.Println(s.Status())
-		//get redis conn from pool
-		//report to redis
-		//release redis conn
+
+		// get redis conn from pool
+		rc := redisPool.Get()
+
+		// report to redis
+		report, _ := json.Marshal(s.Status())
+		serverNode := s.Status().Node
+		rc.Do("HSET", "admin_stream_status", serverNode, report)
+
+		// release redis conn
+		rc.Close()
 	}
 }
