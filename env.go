@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"strings"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -40,4 +41,19 @@ func envPort() string {
 		return (":" + env) //golang and its weird port mechanics
 	}
 	return ":8001"
+}
+
+// what is our dev/staging/prod environment
+func env() string {
+	env := os.Getenv("GO_ENV")
+	if env != "" {
+		return strings.ToLower(env)
+	}
+	return "development"
+}
+func envIsStaging() bool {
+	return env() == "staging"
+}
+func envIsProduction() bool {
+	return env() == "production"
 }
