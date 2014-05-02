@@ -58,6 +58,16 @@ func sseHandler(w http.ResponseWriter, r *http.Request, h *hub) {
 	namespace := r.URL.Path[10:] // strip out the prepending "/subscribe"
 	// TODO: we should do the above in a clever way so we work on any path
 
+	// override RemoteAddr to trust proxy IP msgs if they exist
+	// pattern taken from http://git.io/xDD3Mw
+	ip := r.Header.Get("X-Real-IP")
+	if ip == "" {
+		ip = r.Header.Get("X-Forwarded-For")
+	}
+	if ip != "" {
+		r.RemoteAddr = ip
+	}
+
 	log.Println("CONNECT\t", namespace, "\t", r.RemoteAddr)
 
 	headers := w.Header()
