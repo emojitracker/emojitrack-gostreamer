@@ -6,21 +6,13 @@ import (
 
 // SSEMessage is a message suitable for sending over a Server-Sent Event stream.
 //
-// The following fields are provided:
-//   Event (string) - an event scope for the message [optional].
-//   Data  ([]byte) - the message payload.
-//   Namespace (string) - namespace to match a message to a client subscription.
-//
-// For more information on the SSE format itself, check out this article:
-// http://www.html5rocks.com/en/tutorials/eventsource/basics/
-//
-// Note `Namespace` is not part of the SSE spec, it is merely used internally to
+// Note: Namespace is not part of the SSE spec, it is merely used internally to
 // map a message to the appropriate HTTP virtual endpoint.
 //
 type SSEMessage struct {
-	Event     string
-	Data      []byte
-	Namespace string
+	Event     string // event scope for the message [optional]
+	Data      []byte // message payload
+	Namespace string // namespace for msg, matches to client subscriptions
 }
 
 // sseFormat is the formatted bytestring for a SSE message, ready to be sent.

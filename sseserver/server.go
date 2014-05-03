@@ -16,7 +16,7 @@ type Server struct {
 	hub       *hub
 }
 
-// Creates a new sseServer and returns a reference to it.
+// Creates a new Server and returns a reference to it.
 func NewServer() *Server {
 
 	// set up the public interface
@@ -36,9 +36,10 @@ func NewServer() *Server {
 	return &s
 }
 
-// Begin serving SSE connections on specified addr.
-// This method blocks forever, as it's basically a setup wrapper around
-// `http.ListenAndServe()`
+// Begin serving connections on specified address.
+//
+// This method blocks forever, as it is basically a setup wrapper around
+// http.ListenAndServe()
 func (s *Server) Serve(addr string) {
 
 	// set up routes.

@@ -16,7 +16,7 @@ type hubStatus struct {
 }
 
 // Status returns the status struct for a given server.
-// This mirrors what is made available on the `/admin/status.json` endpoint.
+// This mirrors what is made available on the /admin/status.json endpoint.
 //
 // Mostly useful for reporting.
 func (s *Server) Status() hubStatus {
