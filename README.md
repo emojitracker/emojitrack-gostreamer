@@ -1,13 +1,43 @@
-Attempting to implement an API compatible server from emojitrack-streamer-spec in Go.
+emojitrack-gostreamer (WORK IN PROGRESS)
+=====================
 
-My first Go project, so there will probably be some dumb stuff here.
+Implementation of an API compatible server for
+the [emojitrack-streamer-spec][1] in Go.
 
-Cribbing a lot for the HTTP stuff from:
-http://gary.burd.info/go-websocket-chat
+Caveats
+-------
+![noidea](http://static.someecards.com/someecards/usercards/MjAxMi0wZmYwN2ZiYmIyNzVkNzIy.png)
 
-TODO:
- - move scorepacker and connectionpool into their own packages
- - possibly add tests for them even!
- - handle redis server reconnects
- - parse standard single `REDIS_URL` env var
- - dont emit empty msgs (but lets wait until done benchmarking)
+This is my first Go project, so there will potentially be some dumb stuff here.
+Please feel encouraged to send pull requests or line comments even for idiomatic
+syntax issues when accompanied with an explanation that will help me learn.
+
+Pipeline Flow
+-------------
+Goroutines and channels make it just too much fun to think about things as flow
+diagrams.  This is the essential pipeline for information flow in the `main()`
+function for the program.
+
+![diagram](docs/diagram.svg)
+
+Package sseserver
+-----------------
+This program doesn't actually do too much beyond the pipeline flow above, as all
+of the SSE/HTTP server logic has been extracted into a handy modular package
+that should be usable for any generic SSE broadcasting.  For that stuff, delve into the
+[sseserver](sseserver/) subdirectory.
+
+Is it any fast?
+-----------
+Yes.:racehorse: Benchmarks coming eventually.
+
+TODO
+----
+
+ - [x] move scorepacker and connectionpool into their own packages
+ - [ ] possibly add tests for them even!
+ - [x] handle redis server reconnects
+ - [x] parse standard single `REDIS_URL` env var
+ - [ ] dont emit empty msgs (but lets wait until done benchmarking)
+
+[1]: http://github.com/mroth/emojitrack-streamer-spec

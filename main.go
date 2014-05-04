@@ -50,6 +50,7 @@ func main() {
 	// have a small amount of overhead in creating the SSEMessage so this is
 	// theoretically better if we are running in parallel on appropriate hardware.
 
+	// rawPublisher
 	go func() {
 		for msg := range rawScoreUpdates {
 			clients <- sseserver.SSEMessage{
@@ -60,6 +61,7 @@ func main() {
 		}
 	}()
 
+	// epsPublisher
 	go func() {
 		for val := range epsScoreUpdates {
 			clients <- sseserver.SSEMessage{
@@ -70,6 +72,7 @@ func main() {
 		}
 	}()
 
+	// detailPublisher
 	go func() {
 		for msg := range detailUpdates {
 			dchan := "/details/" + strings.Split(msg.channel, ".")[2]
