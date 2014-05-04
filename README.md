@@ -18,7 +18,7 @@ Goroutines and channels make it just too much fun to think about things as flow
 diagrams.  This is the essential pipeline for information flow in the `main()`
 function for the program.
 
-![diagram](docs/diagram.svg)
+![diagram](http://f.cl.ly/items/1S282j3A0H07382x3q2L/diagram.svg)
 
 Package sseserver
 -----------------
