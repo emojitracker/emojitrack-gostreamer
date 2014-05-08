@@ -21,9 +21,11 @@ func ScorePacker(input <-chan string, period time.Duration) <-chan []byte {
 				// since int nil-value is zero dont have to worry about init case!
 				scores[id] = scores[id] + 1 // increment hash
 			case <-ticker:
-				packedscores, _ := json.Marshal(scores)
-				output <- packedscores         // output to channel
-				scores = make(map[string]uint) // reset hash
+				if len(scores) > 0 {
+					packedscores, _ := json.Marshal(scores)
+					output <- packedscores         // output to channel
+					scores = make(map[string]uint) // reset hash
+				}
 			}
 		}
 	}()
