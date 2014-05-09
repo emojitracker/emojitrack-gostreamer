@@ -20,7 +20,7 @@ Words.
 
 API
 ---
-See the godocs.
+See the [godocs](https://godoc.org/github.com/mroth/emojitrack-gostreamer/sseserver).
 
 
 Example
