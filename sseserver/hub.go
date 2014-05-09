@@ -35,10 +35,11 @@ func (h *hub) run() {
 			delete(h.connections, c)
 			close(c.send)
 		case msg := <-h.broadcast:
+			formattedMsg := msg.sseFormat()
 			for c := range h.connections {
 				if msg.Namespace == c.namespace {
 					select {
-					case c.send <- msg.sseFormat():
+					case c.send <- formattedMsg:
 					default:
 						Debug("cant pass to a connection send chan, buffer is full -- kill it with fire")
 						delete(h.connections, c)
