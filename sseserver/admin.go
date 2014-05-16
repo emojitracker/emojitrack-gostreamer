@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sort"
 	"time"
 )
 
 type hubStatus struct {
-	Node        string             `json:"node"`
-	Status      string             `json:"status"`
-	Reported    int64              `json:"reported_at"`
-	Connections []connectionStatus `json:"connections"`
+	Node        string         `json:"node"`
+	Status      string         `json:"status"`
+	Reported    int64          `json:"reported_at"`
+	Connections connStatusList `json:"connections"`
 }
 
 // Status returns the status struct for a given server.
@@ -22,6 +23,13 @@ type hubStatus struct {
 func (s *Server) Status() hubStatus {
 	return s.hub.Status()
 }
+
+// implement sort.Interface for the connections
+type connStatusList []connectionStatus
+
+func (cl connStatusList) Len() int           { return len(cl) }
+func (cl connStatusList) Swap(i, j int)      { cl[i], cl[j] = cl[j], cl[i] }
+func (cl connStatusList) Less(i, j int) bool { return cl[i].Created < cl[j].Created }
 
 // Status returns the status struct for a given connection hub.
 // This hub is the real source of truth and Server is just a wrapper but people
@@ -34,10 +42,11 @@ func (h *hub) Status() hubStatus {
 		Reported: time.Now().Unix(),
 	}
 
-	stat.Connections = []connectionStatus{}
+	stat.Connections = connStatusList{}
 	for k := range h.connections {
 		stat.Connections = append(stat.Connections, k.Status())
 	}
+	sort.Sort(stat.Connections)
 
 	return stat
 }
