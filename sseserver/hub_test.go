@@ -5,18 +5,76 @@ import (
 	"time"
 )
 
-func mockHub(conns int) (h *hub) {
+func mockHub(initialConnections int) (h *hub) {
 	h = newHub()
 	go h.run()
-	for i := 0; i < conns; i++ {
-		c := &connection{
-			send: make(chan []byte, 256),
-			created:   time.Now(),
-			namespace: "/test",
-		}
-		h.register <- c
+	for i := 0; i < initialConnections; i++ {
+		h.register <- mockConn("/test")
 	}
 	return h
+}
+
+func mockConn(namespace string) *connection {
+	return &connection{
+		send:      make(chan []byte, 256),
+		created:   time.Now(),
+		namespace: namespace,
+	}
+}
+
+type deliveryCase struct {
+	conn     *connection
+	expected int
+}
+
+func TestBroadcastSingleplex(t *testing.T) {
+	h := mockHub(0)
+	c1 := mockConn("/foo")
+	c2 := mockConn("/bar")
+	h.register <- c1
+	h.register <- c2
+
+	//broadcast to foo channel
+	h.broadcast <- SSEMessage{"", []byte("yo"), "/foo"}
+
+	//check for proper delivery
+	d := []deliveryCase{
+		deliveryCase{c1, 1},
+		deliveryCase{c2, 0},
+	}
+	for _, c := range d {
+		if actual := len(c.conn.send); actual != c.expected {
+			t.Fatalf("Expected conn to have %d message in queue, actual: %d", c.expected, actual)
+		}
+	}
+
+}
+
+func TestBroadcastMultiplex(t *testing.T) {
+	h := mockHub(0)
+	c1 := mockConn("/foo")
+	c2 := mockConn("/foo")
+	c3 := mockConn("/burrito")
+	h.register <- c1
+	h.register <- c2
+	h.register <- c3
+
+	//broadcast to channels
+	h.broadcast <- SSEMessage{"", []byte("yo"), "/foo"}
+	h.broadcast <- SSEMessage{"", []byte("yo"), "/foo"}
+	h.broadcast <- SSEMessage{"", []byte("yo"), "/bar"}
+
+	//check for proper delivery
+	d := []deliveryCase{
+		deliveryCase{c1, 2},
+		deliveryCase{c2, 2},
+		deliveryCase{c3, 0},
+	}
+	for _, c := range d {
+		if actual := len(c.conn.send); actual != c.expected {
+			t.Fatalf("Expected conn to have %d message in queue, actual: %d", c.expected, actual)
+		}
+	}
 }
 
 func benchmarkBroadcast(conns int, b *testing.B) {
