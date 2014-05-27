@@ -133,6 +133,12 @@ data:LOLcat
 
 Yep, it's that simple.
 
+Namespace Nesting
+-----------------
+As per `$VERSION`, a client can subscribe to a parent namespace. E.g. a subscription
+to `/pets` will receive messages broadcast to both `/pets/dogs` and
+`/pets/cats`.
+
 Acknowledgements
 ----------------
 A lot of the ideas for handling the connection hub in idiomatic Go originally

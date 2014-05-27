@@ -77,6 +77,38 @@ func TestBroadcastMultiplex(t *testing.T) {
 	}
 }
 
+func TestBroadcastWildcards(t *testing.T) {
+	h := mockHub(0)
+
+	cDogs := mockConn("/pets/dogs")
+	cCats := mockConn("/pets/cats")
+	cWild := mockConn("/pets")
+	cOther := mockConn("/kids")
+
+	h.register <- cDogs
+	h.register <- cCats
+	h.register <- cWild
+	h.register <- cOther
+
+	//broadcast to channels
+	h.broadcast <- SSEMessage{"", []byte("woof"), "/pets/dogs"}
+	h.broadcast <- SSEMessage{"", []byte("meow"), "/pets/cats"}
+	h.broadcast <- SSEMessage{"", []byte("wahh"), "/kids"}
+
+	//check for proper delivery
+	d := []deliveryCase{
+		deliveryCase{cDogs, 1},
+		deliveryCase{cCats, 1},
+		deliveryCase{cWild, 2},
+		deliveryCase{cOther, 1},
+	}
+	for _, c := range d {
+		if actual := len(c.conn.send); actual != c.expected {
+			t.Fatalf("Expected conn to have %d message in queue, actual: %d", c.expected, actual)
+		}
+	}
+}
+
 func benchmarkBroadcast(conns int, b *testing.B) {
 	h := mockHub(conns)
 

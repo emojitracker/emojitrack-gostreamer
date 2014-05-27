@@ -2,6 +2,7 @@ package sseserver
 
 import (
 	. "github.com/azer/debug"
+	"strings"
 )
 
 // A connection hub keeps track of all the active client connections, and
@@ -37,7 +38,7 @@ func (h *hub) run() {
 		case msg := <-h.broadcast:
 			formattedMsg := msg.sseFormat()
 			for c := range h.connections {
-				if msg.Namespace == c.namespace {
+				if strings.HasPrefix(msg.Namespace, c.namespace) {
 					select {
 					case c.send <- formattedMsg:
 					default:
