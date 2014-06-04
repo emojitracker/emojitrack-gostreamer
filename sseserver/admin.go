@@ -73,7 +73,7 @@ func env() string {
 	}
 }
 
-func adminHandler(w http.ResponseWriter, r *http.Request, h *hub) {
+func adminStatusDataHandler(w http.ResponseWriter, r *http.Request, h *hub) {
 	w.Header().Set("Content-Type", "application/json")
 	b, _ := json.MarshalIndent(h.Status(), "", "  ")
 	fmt.Fprint(w, string(b))

@@ -49,8 +49,12 @@ func (s *Server) Serve(addr string) {
 		sseHandler(w, r, s.hub)
 	})
 
+	http.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "sseserver/views/admin.html")
+	})
+
 	http.HandleFunc("/admin/status.json", func(w http.ResponseWriter, r *http.Request) {
-		adminHandler(w, r, s.hub)
+		adminStatusDataHandler(w, r, s.hub)
 	})
 
 	// actually start the HTTP server
