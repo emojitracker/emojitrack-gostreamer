@@ -10,6 +10,8 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/1.5.3/numeral.min.js"></script>
 
     <style media="screen">
       @media (max-width: 640px) {
@@ -21,11 +23,10 @@
     <article class="container">
       <h2>system info</h2>
       <ul>
-        <li>uptime:</li>
-        <li>messages broadcast (origin):</li>
-        <li>messages broadcast (remote):</li>
-        <li>memory usage:</li>
-        <li>goroutines:</li>
+        <li>uptime: <time class="timeago" data-bind="text: startup_time, attr: {datetime: startup_time}"></time></li>
+        <li>messages broadcast (unique): <span data-bind="text: msgs_broadcast"></span></li>
+        <!-- <li>memory usage: <span data-bind="text: mem_usage"></span></li>
+        <li>goroutines: <span data-bind="text: goroutines"></span></li> -->
       </ul>
       <h2>open streams <small>N open</small></h2>
       <!-- <div class="table-responsive"> -->
@@ -34,6 +35,7 @@
             <th><i class="fa fa-tag"></i>&nbsp;namespace</th>
             <th><i class="fa fa-globe"></i>&nbsp;client</th>
             <th class="hidden-xs"><i class="fa fa-flag"></i>&nbsp;established</th>
+            <th class="hidden-xs"><i class="fa fa-check"></i>&nbsp;msgs</th>
             <th><i class="fa fa-clock-o"></i>&nbsp;age</th>
           </thead>
           <tbody>
@@ -54,6 +56,9 @@
         </td>
         <td class="hidden-xs">
           <time datetime="{{created_iso}}">{{created_at}}</time>
+        </td>
+        <td class="hidden-xs">
+          <tt>{{msgs_sent}}</tt>
         </td>
         <td>
           <i class="fa fa-clock-o hidden-xs"></i>
@@ -90,9 +95,10 @@
       // render status from server
       var renderTable = function() {
         $.get("/admin/status.json", function(response) {
-          console.log(response);
+          statsModel.msgs_broadcast( numeral(response.msgs_broadcast).format('0.00a').toUpperCase() );
+          statsModel.startup_time( new Date(response.startup_time * 1000).toISOString() );
+
           response.connections.forEach( function(entry) {
-            // console.log(entry.client_ip);
             renderTableEntry(entry);
           });
         }, "json");
@@ -108,6 +114,7 @@
           created_at: new Date(client.created_at * 1000),
           created_iso: new Date(client.created_at * 1000).toISOString(),
           age: Math.floor(Date.now() / 1000) - client.created_at,
+          msgs_sent: client.msgs_sent //numeral(client.msgs_sent).format('0a')
         };
         var rendered_entry = Handlebars.templates.entry(context);
         $("tbody").append(rendered_entry);
@@ -115,6 +122,15 @@
       }
 
 
+      //create KO view model for stats
+      var statsModel = {
+        startup_time: ko.observable('-'),
+        msgs_broadcast: ko.observable('-'),
+        mem_usage: ko.observable('-'),
+        goroutines: ko.observable('-')
+      }
+
+      // page is loaded, do stuff
       $(document).ready( function() {
         // compile handlebars template for list entries
         Handlebars.templates.entry = Handlebars.compile( $('#entry-template').html() );
@@ -122,8 +138,8 @@
         // render the current server status to table
         renderTable();
 
-        // attach timeago plugin to timestamps
-        // $("time.timeago").timeago();
+        // apply KO bindings for stats
+        ko.applyBindings(statsModel);
 
         console.log("loaded!");
       });
