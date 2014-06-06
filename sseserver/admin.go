@@ -13,6 +13,7 @@ type hubStatus struct {
 	Node        string         `json:"node"`
 	Status      string         `json:"status"`
 	Reported    int64          `json:"reported_at"`
+	StartupTime int64          `json:"startup_time"`
 	SentMsgs    uint64         `json:"msgs_broadcast"`
 	Connections connStatusList `json:"connections"`
 }
@@ -38,10 +39,11 @@ func (cl connStatusList) Less(i, j int) bool { return cl[i].Created < cl[j].Crea
 func (h *hub) Status() hubStatus {
 
 	stat := hubStatus{
-		Node:     fmt.Sprintf("%s-%s-%s", platform(), env(), dyno()),
-		Status:   "OK",
-		Reported: time.Now().Unix(),
-		SentMsgs: h.sentMsgs,
+		Node:        fmt.Sprintf("%s-%s-%s", platform(), env(), dyno()),
+		Status:      "OK",
+		Reported:    time.Now().Unix(),
+		StartupTime: h.startupTime.Unix(),
+		SentMsgs:    h.sentMsgs,
 	}
 
 	stat.Connections = connStatusList{}

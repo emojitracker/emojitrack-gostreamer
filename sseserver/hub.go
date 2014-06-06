@@ -3,6 +3,7 @@ package sseserver
 import (
 	. "github.com/azer/debug"
 	"strings"
+	"time"
 )
 
 // A connection hub keeps track of all the active client connections, and
@@ -14,6 +15,7 @@ type hub struct {
 	register    chan *connection     // Register requests from the connections.
 	unregister  chan *connection     // Unregister requests from connections.
 	sentMsgs    uint64               // Msgs broadcast since startup
+	startupTime time.Time            // Time hub was created
 }
 
 func newHub() *hub {
@@ -22,6 +24,7 @@ func newHub() *hub {
 		connections: make(map[*connection]bool),
 		register:    make(chan *connection),
 		unregister:  make(chan *connection),
+		startupTime: time.Now(),
 	}
 }
 
