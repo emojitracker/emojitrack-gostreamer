@@ -13,6 +13,7 @@ type hubStatus struct {
 	Node        string         `json:"node"`
 	Status      string         `json:"status"`
 	Reported    int64          `json:"reported_at"`
+	SentMsgs    uint64         `json:"msgs_broadcast"`
 	Connections connStatusList `json:"connections"`
 }
 
@@ -40,6 +41,7 @@ func (h *hub) Status() hubStatus {
 		Node:     fmt.Sprintf("%s-%s-%s", platform(), env(), dyno()),
 		Status:   "OK",
 		Reported: time.Now().Unix(),
+		SentMsgs: h.sentMsgs,
 	}
 
 	stat.Connections = connStatusList{}

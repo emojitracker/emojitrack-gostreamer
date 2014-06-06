@@ -13,6 +13,7 @@ type hub struct {
 	connections map[*connection]bool // Registered connections.
 	register    chan *connection     // Register requests from the connections.
 	unregister  chan *connection     // Unregister requests from connections.
+	sentMsgs    uint64               // Msgs broadcast since startup
 }
 
 func newHub() *hub {
@@ -35,6 +36,7 @@ func (h *hub) run() {
 			delete(h.connections, c)
 			close(c.send)
 		case msg := <-h.broadcast:
+			h.sentMsgs++
 			formattedMsg := msg.sseFormat()
 			for c := range h.connections {
 				if strings.HasPrefix(msg.Namespace, c.namespace) {

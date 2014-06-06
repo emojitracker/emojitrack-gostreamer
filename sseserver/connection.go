@@ -13,6 +13,7 @@ type connection struct {
 	created   time.Time           // Timestamp for when connection was opened
 	send      chan []byte         // Buffered channel of outbound messages
 	namespace string              // Conceptual "channel" SSE client is requesting
+	msgsSent  uint64              // Msgs the connection has sent (all time)
 }
 
 type connectionStatus struct {
@@ -21,6 +22,7 @@ type connectionStatus struct {
 	Created   int64  `json:"created_at"`
 	ClientIP  string `json:"client_ip"`
 	UserAgent string `json:"user_agent"`
+	MsgsSent  uint64 `json:"msgs_sent"`
 }
 
 func (c *connection) Status() connectionStatus {
@@ -30,6 +32,7 @@ func (c *connection) Status() connectionStatus {
 		Created:   c.created.Unix(),
 		ClientIP:  c.r.RemoteAddr,
 		UserAgent: c.r.UserAgent(),
+		MsgsSent:  c.msgsSent,
 	}
 }
 
@@ -46,6 +49,7 @@ func (c *connection) writer() {
 			}
 			if f, ok := c.w.(http.Flusher); ok {
 				f.Flush()
+				c.msgsSent++
 			}
 		case <-closer:
 			Debug("closer fired for conn")
