@@ -9,7 +9,6 @@
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/1.5.3/numeral.min.js"></script>
 
@@ -28,48 +27,42 @@
         <!-- <li>memory usage: <span data-bind="text: mem_usage"></span></li>
         <li>goroutines: <span data-bind="text: goroutines"></span></li> -->
       </ul>
-      <h2>open streams <small>N open</small></h2>
-      <!-- <div class="table-responsive"> -->
-        <table class="table table-striped table-hover table-condensed">
-          <thead>
-            <th><i class="fa fa-tag"></i>&nbsp;namespace</th>
-            <th><i class="fa fa-globe"></i>&nbsp;client</th>
-            <th class="hidden-xs"><i class="fa fa-flag"></i>&nbsp;established</th>
-            <th class="hidden-xs"><i class="fa fa-check"></i>&nbsp;msgs</th>
-            <th><i class="fa fa-clock-o"></i>&nbsp;age</th>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-      <!-- </div> -->
+      <h2>open streams <small><span data-bind="text: clients().length">N</span> open</small></h2>
+
+      <table class="table table-striped table-hover table-condensed">
+        <thead>
+          <th><i class="fa fa-tag"></i>&nbsp;namespace</th>
+          <th><i class="fa fa-globe"></i>&nbsp;client</th>
+          <th class="hidden-xs"><i class="fa fa-flag"></i>&nbsp;established</th>
+          <th class="hidden-xs"><i class="fa fa-check"></i>&nbsp;msgs</th>
+          <th><i class="fa fa-clock-o"></i>&nbsp;age</th>
+        </thead>
+        <tbody data-bind="foreach: clients">
+          <tr>
+            <td>
+              <code data-bind="text: request_path"></code>
+            </td>
+            <td>
+              <i class="{{icon}}" title="{{user_agent}}"></i>
+              &nbsp;
+              <tt data-bind="text: remote_ip"></tt>
+            </td>
+            <td class="hidden-xs">
+              <time data-bind="text: created_at, attr: {datetime: created_iso}"></time>
+            </td>
+            <td class="hidden-xs">
+              <tt data-bind="text: msgs_sent"></tt>
+            </td>
+            <td>
+              <i class="fa fa-clock-o hidden-xs"></i>
+              <time class="timeago" data-bind="text: created_at, attr: {datetime: created_iso}"></time>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </article>
 
-    <script id="entry-template" type="text/x-handlebars-template">
-      <tr>
-        <td>
-          <code>{{request_path}}</code>
-        </td>
-        <td>
-          <i class="{{icon}}" title="{{user_agent}}"></i>
-          &nbsp;
-          <tt>{{remote_ip}}</tt>
-        </td>
-        <td class="hidden-xs">
-          <time datetime="{{created_iso}}">{{created_at}}</time>
-        </td>
-        <td class="hidden-xs">
-          <tt>{{msgs_sent}}</tt>
-        </td>
-        <td>
-          <i class="fa fa-clock-o hidden-xs"></i>
-          <time class="timeago" datetime="{{created_iso}}">{{created_at}}</time>
-        </td>
-      </tr>
-    </script>
-
     <script type="text/javascript">
-      // object we stick compiled HB templates in
-      Handlebars.templates = {};
 
       // override timeago settings for shorter format
       jQuery.timeago.settings.strings = {
@@ -95,51 +88,48 @@
       // render status from server
       var renderTable = function() {
         $.get("/admin/status.json", function(response) {
-          statsModel.msgs_broadcast( numeral(response.msgs_broadcast).format('0.00a').toUpperCase() );
-          statsModel.startup_time( new Date(response.startup_time * 1000).toISOString() );
+          statisticsViewModel.msgs_broadcast( numeral(response.msgs_broadcast).format('0.00a').toUpperCase() );
+          statisticsViewModel.startup_time( new Date(response.startup_time * 1000).toISOString() );
 
           response.connections.forEach( function(entry) {
-            renderTableEntry(entry);
+            statisticsViewModel.clients.push( new Connection(entry) );
           });
+
+          // apply timeago
+          $("time.timeago").timeago();
         }, "json");
       }
 
-      // render individual status entry
-      var renderTableEntry = function(client) {
-        var context = {
-          request_path: client.namespace,
-          remote_ip: client.client_ip,
-          user_agent: client.user_agent,
-          // icon: "icon-" + pickPlatformIcon(client.user_agent)
-          created_at: new Date(client.created_at * 1000),
-          created_iso: new Date(client.created_at * 1000).toISOString(),
-          age: Math.floor(Date.now() / 1000) - client.created_at,
-          msgs_sent: client.msgs_sent //numeral(client.msgs_sent).format('0a')
-        };
-        var rendered_entry = Handlebars.templates.entry(context);
-        $("tbody").append(rendered_entry);
-        $("time.timeago").timeago();
-      }
-
-
       //create KO view model for stats
-      var statsModel = {
+      var statisticsViewModel = {
         startup_time: ko.observable('-'),
         msgs_broadcast: ko.observable('-'),
         mem_usage: ko.observable('-'),
-        goroutines: ko.observable('-')
+        goroutines: ko.observable('-'),
+
+        clients: ko.observableArray()
+      }
+
+      function Connection(client) {
+        var self = this;
+
+        self.request_path = client.namespace;
+        self.remote_ip = client.client_ip;
+        self.user_agent = client.user_agent;
+
+        self.created_at = new Date(client.created_at * 1000);
+        self.created_iso = new Date(client.created_at * 1000).toISOString();
+        // self.age: Math.floor(Date.now() / 1000) - client.created_at,
+        self.msgs_sent = ko.observable(client.msgs_sent);
       }
 
       // page is loaded, do stuff
       $(document).ready( function() {
-        // compile handlebars template for list entries
-        Handlebars.templates.entry = Handlebars.compile( $('#entry-template').html() );
-
         // render the current server status to table
         renderTable();
 
-        // apply KO bindings for stats
-        ko.applyBindings(statsModel);
+        // apply KO bindings
+        ko.applyBindings(statisticsViewModel);
 
         console.log("loaded!");
       });
