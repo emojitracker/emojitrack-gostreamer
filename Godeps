@@ -1,9 +1,6 @@
 {
 	"ImportPath": "github.com/mroth/emojitrack-gostreamer",
 	"GoVersion": "go1.3",
-	"Packages": [
-		"./..."
-	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/azer/debug",
@@ -20,6 +17,10 @@
 		{
 			"ImportPath": "github.com/joho/godotenv",
 			"Rev": "3c13a80fe13f26da8d7cf5b257bdfe54975b8043"
+		},
+		{
+			"ImportPath": "github.com/mroth/sseserver",
+			"Rev": "39fef29168af1caf8c020c914036aa54d06a26ba"
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/go-metrics",

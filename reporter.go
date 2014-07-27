@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/mroth/emojitrack-gostreamer/sseserver"
+	"github.com/mroth/sseserver"
 	"github.com/yvasiyarov/gorelic"
 )
 

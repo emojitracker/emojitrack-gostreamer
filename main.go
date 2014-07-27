@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mroth/emojitrack-gostreamer/sseserver"
+	"github.com/mroth/sseserver"
 )
 
 func main() {
