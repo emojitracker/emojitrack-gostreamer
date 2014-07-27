@@ -25,7 +25,7 @@ Package sseserver
 This program doesn't actually do too much beyond the pipeline flow above, as all
 of the SSE/HTTP server logic has been extracted into a handy modular package
 that should be usable for any generic SSE broadcasting.  For that stuff, delve into the
-[sseserver](sseserver/) subdirectory.
+[sseserver](https://github.com/mroth/sseserver/) repo.
 
 Is it any fast?
 -----------
