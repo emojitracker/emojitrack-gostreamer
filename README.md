@@ -1,4 +1,4 @@
-emojitrack-gostreamer (WORK IN PROGRESS)
+emojitrack-gostreamer
 =====================
 
 Implementation of an API compatible server for
@@ -38,6 +38,6 @@ TODO
  - [ ] possibly add tests for them even!
  - [x] handle redis server reconnects
  - [x] parse standard single `REDIS_URL` env var
- - [ ] dont emit empty msgs (but lets wait until done benchmarking)
+ - [x] dont emit empty msgs (but lets wait until done benchmarking)
 
 [1]: http://github.com/mroth/emojitrack-streamer-spec
