@@ -33,7 +33,7 @@
 		},
 		{
 			"ImportPath": "github.com/mroth/sseserver",
-			"Rev": "f073b98b1a8b7610de2d320ae1999df888fcb7de"
+			"Rev": "c9dbae3a0819ff4bc358c564d50ca5a645da42b0"
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/go-metrics",
