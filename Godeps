@@ -3,12 +3,25 @@
 	"GoVersion": "go1.3",
 	"Deps": [
 		{
+			"ImportPath": "bitbucket.org/kardianos/osext",
+			"Comment": "null-13",
+			"Rev": "5d3ddcf53a508cc2f7404eaebf546ef2cb5cdb6e"
+		},
+		{
+			"ImportPath": "github.com/GeertJohan/go.rice",
+			"Rev": "a4d0b5624c673fef4b517f350272136ced6bb5b1"
+		},
+		{
 			"ImportPath": "github.com/azer/debug",
 			"Rev": "43d0251a32dc740e0af2bc597049ca5ed383b89a"
 		},
 		{
 			"ImportPath": "github.com/azer/go-style",
 			"Rev": "14e31c5abbe5c10d3ea655bec860b312d2225f84"
+		},
+		{
+			"ImportPath": "github.com/daaku/go.zipexe",
+			"Rev": "44882fc939f4c58d87a60de34796c6cfb9623269"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
@@ -20,7 +33,7 @@
 		},
 		{
 			"ImportPath": "github.com/mroth/sseserver",
-			"Rev": "39fef29168af1caf8c020c914036aa54d06a26ba"
+			"Rev": "f073b98b1a8b7610de2d320ae1999df888fcb7de"
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/go-metrics",
