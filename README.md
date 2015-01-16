@@ -8,9 +8,9 @@ Caveats
 -------
 ![noidea](http://static.someecards.com/someecards/usercards/MjAxMi0wZmYwN2ZiYmIyNzVkNzIy.png)
 
-This is my first Go project, so there will potentially be some dumb stuff here.
-Please feel encouraged to send pull requests or line comments even for idiomatic
-syntax issues when accompanied with an explanation that will help me learn.
+This was my first major Go project, so there may potentially still be some dumb stuff left 
+in the code here.Please feel encouraged to send pull requests or line comments even for 
+idiomatic syntax issues when accompanied with an explanation that will help me learn.
 
 Pipeline Flow
 -------------
@@ -25,11 +25,11 @@ Package sseserver
 This program doesn't actually do too much beyond the pipeline flow above, as all
 of the SSE/HTTP server logic has been extracted into a handy modular package
 that should be usable for any generic SSE broadcasting.  For that stuff, delve into the
-[sseserver](https://github.com/mroth/sseserver/) repo.
+(freely licensed!) [sseserver](https://github.com/mroth/sseserver/) repo.
 
 Is it any fast?
 -----------
-Yes.:racehorse: Benchmarks coming eventually.
+Yes.:racehorse:
 
 TODO
 ----
