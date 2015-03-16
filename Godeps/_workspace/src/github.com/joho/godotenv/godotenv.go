@@ -16,9 +16,10 @@ and all the env vars declared in .env will be avaiable through os.Getenv("SOME_E
 package godotenv
 
 import (
+	"bufio"
 	"errors"
-	"io/ioutil"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -45,6 +46,10 @@ func Load(filenames ...string) (err error) {
 	return
 }
 
+/*
+  Read all env (with same file loading semantics as Load) but return values as
+  a map rather than automatically writing values into env
+*/
 func Read(filenames ...string) (envMap map[string]string, err error) {
 	filenames = filenamesOrDefault(filenames)
 	envMap = make(map[string]string)
@@ -65,6 +70,25 @@ func Read(filenames ...string) (envMap map[string]string, err error) {
 	return
 }
 
+/*
+  Loads env vars from the specified filenames (empty map falls back to default)
+  then executes the cmd specified.
+
+  Simply hooks up os.Stdin/err/out to the command and calls Run()
+
+  If you want more fine grained control over your command it's recommended
+  that you use `Load()` or `Read()` and the `os/exec` package yourself.
+*/
+func Exec(filenames []string, cmd string, cmdArgs []string) error {
+	Load(filenames...)
+
+	command := exec.Command(cmd, cmdArgs...)
+	command.Stdin = os.Stdin
+	command.Stdout = os.Stdout
+	command.Stderr = os.Stderr
+	return command.Run()
+}
+
 func filenamesOrDefault(filenames []string) []string {
 	if len(filenames) == 0 {
 		return []string{".env"}
@@ -80,27 +104,34 @@ func loadFile(filename string) (err error) {
 	}
 
 	for key, value := range envMap {
-		os.Setenv(key, value)
+		if os.Getenv(key) == "" {
+			os.Setenv(key, value)
+		}
 	}
 
 	return
 }
 
 func readFile(filename string) (envMap map[string]string, err error) {
-	content, err := ioutil.ReadFile(filename)
+	file, err := os.Open(filename)
 	if err != nil {
 		return
 	}
+	defer file.Close()
 
 	envMap = make(map[string]string)
 
-	lines := strings.Split(string(content), "\n")
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
 
 	for _, fullLine := range lines {
 		if !isIgnoredLine(fullLine) {
 			key, value, err := parseLine(fullLine)
 
-			if err == nil && os.Getenv(key) == "" {
+			if err == nil {
 				envMap[key] = value
 			}
 		}

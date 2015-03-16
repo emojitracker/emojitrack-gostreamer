@@ -1,7 +1,8 @@
 package sseserver
 =================
 
-An encapsulated high-performance Server-Sent Events endpoint server for Go.
+An encapsulated high-performance Server-Sent Events endpoint server for Go with 
+advanced namespacing support.
 
 Abstracts multiple namespaced HTTP endpoints so that clients can subscribe to
 messages on on a specific topic.  Should be thread-safe, so you can run multiple
@@ -16,13 +17,14 @@ be done so it should get faster if needed.
 This currently powers the streaming service for
 [Emojitracker](http://emojitracker.com) in production, where it has routinely
 handled dispatching hundreds of messages per second to thousands of clients
-simultaneously, on a single Heroku dyno.
+simultaneously, on a single Heroku dyno. (The previous NodeJS solution required
+dozens of dynos to handle the same load.)
 
 
 Why SSE vs Websockets?
 ----------------------
 
-Words will go here.
+Words will go here.  In the meantime, there is a [semi-decent discussion on StackOverflow](http://stackoverflow.com/questions/5195452/websockets-vs-server-sent-events-eventsource) about the topic.
 
 
 API
@@ -155,7 +157,7 @@ to `/pets` will receive messages broadcast to both `/pets/dogs` and
 
 Acknowledgements
 ----------------
-A lot of the ideas for handling the connection hub in idiomatic Go originally
+A lot of the initial ideas for handling the connection hub in idiomatic Go originally
 came from cribbing from Gary Burd's [go-websocket-chat][1], but has now been
 modified to work with SSE instead of Websockets and to be encapsulated in a
 thread-safe way.

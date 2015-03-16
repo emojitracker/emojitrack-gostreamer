@@ -29,6 +29,16 @@ func operationEmbedGo(pkg *build.Package) {
 	for boxname := range boxMap {
 		// find path and filename for this box
 		boxPath := filepath.Join(pkg.Dir, boxname)
+
+		// Check to see if the path for the box is a symbolic link.  If so, simply
+		// box what the symbolic link points to.  Note: the filepath.Walk function
+		// will NOT follow any nested symbolic links.  This only handles the case
+		// where the root of the box is a symbolic link.
+		symPath, serr := os.Readlink(boxPath)
+		if serr == nil {
+			boxPath = symPath
+		}
+
 		boxFilename := strings.Replace(boxname, "/", "-", -1)
 		boxFilename = strings.Replace(boxFilename, "..", "back", -1)
 		boxFilename = boxFilename + `.rice-box.go`
@@ -46,6 +56,17 @@ func operationEmbedGo(pkg *build.Package) {
 			Dirs:    make(map[string]*dirDataType),
 		}
 
+		boxInfo, ierr := os.Stat(boxPath)
+		if ierr != nil {
+			fmt.Printf("Error: unable to access box at %s\n", boxPath)
+			os.Exit(1)
+		}
+		if !boxInfo.IsDir() {
+			fmt.Printf("Error: Box %s must point to a directory but points to %s instead\n",
+				boxname, boxPath)
+			os.Exit(1)
+		}
+
 		// fill box datastructure with file data
 		filepath.Walk(boxPath, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -58,7 +79,7 @@ func operationEmbedGo(pkg *build.Package) {
 			filename = strings.TrimPrefix(filename, "/")
 			if info.IsDir() {
 				dirData := &dirDataType{
-					Identifier: "dir_" + nextIdentifier(),
+					Identifier: "dir" + nextIdentifier(),
 					FileName:   filename,
 					ModTime:    info.ModTime().Unix(),
 					ChildFiles: make([]*fileDataType, 0),
@@ -75,7 +96,7 @@ func operationEmbedGo(pkg *build.Package) {
 				}
 			} else {
 				fileData := &fileDataType{
-					Identifier: "file_" + nextIdentifier(),
+					Identifier: "file" + nextIdentifier(),
 					FileName:   filename,
 					ModTime:    info.ModTime().Unix(),
 				}
@@ -90,6 +111,10 @@ func operationEmbedGo(pkg *build.Package) {
 				// add tree entry
 				pathParts := strings.Split(fileData.FileName, "/")
 				parentDir := box.Dirs[strings.Join(pathParts[:len(pathParts)-1], "/")]
+				if parentDir == nil {
+					fmt.Printf("Error: parent of %s is not within the box\n", path)
+					os.Exit(1)
+				}
 				parentDir.ChildFiles = append(parentDir.ChildFiles, fileData)
 			}
 			return nil

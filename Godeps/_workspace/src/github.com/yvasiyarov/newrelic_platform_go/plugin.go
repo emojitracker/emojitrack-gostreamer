@@ -60,7 +60,7 @@ func (plugin *NewrelicPlugin) Harvest() error {
 	}
 
 	if httpCode, err := plugin.SendMetricas(); err != nil {
-		log.Printf("Can not send metricas to newrelic: %#v\n", err)
+		log.Printf("Can not send metricas to newrelic: %v\n", err)
 		return err
 	} else {
 
@@ -171,7 +171,7 @@ func (plugin *NewrelicPlugin) CheckResponse(httpResponseCode int) (error, bool) 
 		}
 	case http.StatusInternalServerError, http.StatusBadGateway, http.StatusServiceUnavailable, http.StatusGatewayTimeout:
 		{
-			err = fmt.Errorf("Got %v response code.Metricas will be aggregated")
+			err = fmt.Errorf("Got %v response code.Metricas will be aggregated", httpResponseCode)
 		}
 	}
 	return err, isFatal

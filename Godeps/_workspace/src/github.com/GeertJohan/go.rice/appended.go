@@ -2,12 +2,14 @@ package rice
 
 import (
 	"archive/zip"
-	"bitbucket.org/kardianos/osext"
-	"github.com/daaku/go.zipexe"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/kardianos/osext"
+	"github.com/daaku/go.zipexe"
 )
 
 // appendedBox defines an appended box
@@ -21,6 +23,7 @@ type appendedFile struct {
 	dir      bool
 	dirInfo  *appendedDirInfo
 	children []*appendedFile
+	content  []byte
 }
 
 // appendedBoxes is a public register of appendes boxes
@@ -30,16 +33,17 @@ func init() {
 	// find if exec is appended
 	thisFile, err := osext.Executable()
 	if err != nil {
-		return // not apended
+		return // not appended or cant find self executable
 	}
-	rd, err := zipexe.Open(thisFile)
+	closer, rd, err := zipexe.OpenCloser(thisFile)
 	if err != nil {
-		return // not apended
+		return // not appended
 	}
+	defer closer.Close()
 
 	for _, f := range rd.File {
 		// get box and file name from f.Name
-		fileParts := strings.SplitN(strings.TrimLeft(f.Name, "/"), "/", 2)
+		fileParts := strings.SplitN(strings.TrimLeft(filepath.ToSlash(f.Name), "/"), "/", 2)
 		boxName := fileParts[0]
 		var fileName string
 		if len(fileParts) > 1 {
@@ -64,10 +68,34 @@ func init() {
 			af.dir = true
 			af.dirInfo = &appendedDirInfo{
 				name: filepath.Base(af.zipFile.Name),
-				//++ TODO: use zip modtime when that is set correctly
+				//++ TODO: use zip modtime when that is set correctly: af.zipFile.ModTime()
 				time: time.Now(),
 			}
+		} else {
+			// this is a file, we need it's contents so we can create a bytes.Reader when the file is opened
+			// make a new byteslice
+			af.content = make([]byte, af.zipFile.FileInfo().Size())
+			// ignore reading empty files from zip (empty file still is a valid file to be read though!)
+			if len(af.content) > 0 {
+				// open io.ReadCloser
+				rc, err := af.zipFile.Open()
+				if err != nil {
+					af.content = nil // this will cause an error when the file is being opened or seeked (which is good)
+					// TODO: it's quite blunt to just log this stuff. but this is in init, so rice.Debug can't be changed yet..
+					log.Printf("error opening appended file %s: %v", af.zipFile.Name, err)
+				} else {
+					_, err = rc.Read(af.content)
+					rc.Close()
+					if err != nil {
+						af.content = nil // this will cause an error when the file is being opened or seeked (which is good)
+						// TODO: it's quite blunt to just log this stuff. but this is in init, so rice.Debug can't be changed yet..
+						log.Printf("error reading data for appended file %s: %v", af.zipFile.Name, err)
+					}
+				}
+			}
 		}
+
+		// add appendedFile to box file list
 		box.Files[fileName] = af
 
 		// add to parent dir (if any)

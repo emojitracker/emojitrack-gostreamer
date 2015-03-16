@@ -1,15 +1,18 @@
 package rice
 
 import (
+	"bytes"
 	"errors"
-	"io"
 	"os"
 	"path/filepath"
 )
 
-// File abstracts file methods so the user doesn't see the difference between rice.virtualFile, rice.virtualDir and os.File
-// This type implements the io.Reader, io.Seeker, io.Closer and http.File interfaces
+// File implements the io.Reader, io.Seeker, io.Closer and http.File interfaces
 type File struct {
+	// File abstracts file methods so the user doesn't see the difference between rice.virtualFile, rice.virtualDir and os.File
+	// TODO: maybe use internal File interface and four implementations: *os.File, appendedFile, virtualFile, virtualDir
+
+	// real file on disk
 	realF *os.File
 
 	// when embedded (go)
@@ -17,15 +20,20 @@ type File struct {
 	virtualD *virtualDir
 
 	// when appended (zip)
-	appendedF  *appendedFile
-	appendedRC io.ReadCloser
+	appendedF          *appendedFile
+	appendedFileReader *bytes.Reader
+	// TODO: is appendedFileReader subject of races? Might need a lock here..
 }
 
 // Close is like (*os.File).Close()
 // Visit http://golang.org/pkg/os/#File.Close for more information
 func (f *File) Close() error {
 	if f.appendedF != nil {
-		return f.appendedRC.Close()
+		if f.appendedFileReader == nil {
+			return errors.New("already closed")
+		}
+		f.appendedFileReader = nil
+		return nil
 	}
 	if f.virtualF != nil {
 		return f.virtualF.close()
@@ -42,6 +50,9 @@ func (f *File) Stat() (os.FileInfo, error) {
 	if f.appendedF != nil {
 		if f.appendedF.dir {
 			return f.appendedF.dirInfo, nil
+		}
+		if f.appendedFileReader == nil {
+			return nil, errors.New("file is closed")
 		}
 		return f.appendedF.zipFile.FileInfo(), nil
 	}
@@ -85,6 +96,13 @@ func (f *File) Readdir(count int) ([]os.FileInfo, error) {
 // Visit http://golang.org/pkg/os/#File.Read for more information
 func (f *File) Read(bts []byte) (int, error) {
 	if f.appendedF != nil {
+		if f.appendedFileReader == nil {
+			return 0, &os.PathError{
+				Op:   "read",
+				Path: filepath.Base(f.appendedF.zipFile.Name),
+				Err:  errors.New("file is closed"),
+			}
+		}
 		if f.appendedF.dir {
 			return 0, &os.PathError{
 				Op:   "read",
@@ -92,7 +110,7 @@ func (f *File) Read(bts []byte) (int, error) {
 				Err:  errors.New("is a directory"),
 			}
 		}
-		return f.appendedRC.Read(bts)
+		return f.appendedFileReader.Read(bts)
 	}
 	if f.virtualF != nil {
 		return f.virtualF.read(bts)
@@ -107,7 +125,14 @@ func (f *File) Read(bts []byte) (int, error) {
 // Visit http://golang.org/pkg/os/#File.Seek for more information
 func (f *File) Seek(offset int64, whence int) (int64, error) {
 	if f.appendedF != nil {
-		return 0, ErrNotImplemented
+		if f.appendedFileReader == nil {
+			return 0, &os.PathError{
+				Op:   "seek",
+				Path: filepath.Base(f.appendedF.zipFile.Name),
+				Err:  errors.New("file is closed"),
+			}
+		}
+		return f.appendedFileReader.Seek(offset, whence)
 	}
 	if f.virtualF != nil {
 		return f.virtualF.seek(offset, whence)

@@ -1,19 +1,17 @@
 {
 	"ImportPath": "github.com/mroth/emojitrack-gostreamer",
-	"GoVersion": "go1.3",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
-			"ImportPath": "bitbucket.org/kardianos/osext",
-			"Comment": "null-13",
-			"Rev": "5d3ddcf53a508cc2f7404eaebf546ef2cb5cdb6e"
-		},
-		{
 			"ImportPath": "github.com/GeertJohan/go.rice",
-			"Rev": "a4d0b5624c673fef4b517f350272136ced6bb5b1"
+			"Rev": "b4a18af231435326dd7995d2dd0f3ee31b81f212"
 		},
 		{
 			"ImportPath": "github.com/azer/debug",
-			"Rev": "43d0251a32dc740e0af2bc597049ca5ed383b89a"
+			"Rev": "4769e572857fa58702ece9dde244b3c42de17498"
 		},
 		{
 			"ImportPath": "github.com/azer/go-style",
@@ -21,32 +19,41 @@
 		},
 		{
 			"ImportPath": "github.com/daaku/go.zipexe",
-			"Rev": "44882fc939f4c58d87a60de34796c6cfb9623269"
+			"Rev": "4de5c18ca1fc5294fee64721094ca90c46d26405"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
-			"Rev": "8f6bca66c46849e514ac5abfc71ac9b063c01409"
+			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
 		},
 		{
 			"ImportPath": "github.com/joho/godotenv",
-			"Rev": "3c13a80fe13f26da8d7cf5b257bdfe54975b8043"
+			"Comment": "v1-2-gead2e75",
+			"Rev": "ead2e75027bf1a3f6457e28d9eb3c2fa05109d2b"
+		},
+		{
+			"ImportPath": "github.com/kardianos/osext",
+			"Rev": "ccfcd0245381f0c94c68f50626665eed3c6b726a"
 		},
 		{
 			"ImportPath": "github.com/mroth/sseserver",
-			"Rev": "c9dbae3a0819ff4bc358c564d50ca5a645da42b0"
+			"Rev": "19484734a97ce2201d04989a667463a68f63992f"
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/go-metrics",
-			"Rev": "b23f8b043b6492e7aef34eb11aab268a5c89c14b"
+			"Rev": "c25f46c4b94079672242ec48a545e7ca9ebe3aec"
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/gorelic",
-			"Comment": "v0.0.6-2-ge0ddd42",
-			"Rev": "e0ddd424a569041d2d0094d9ea21f065f6100a67"
+			"Comment": "v0.0.6-14-gb355764",
+			"Rev": "b355764846b999a8a73fc426304f669de56a1a6d"
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/newrelic_platform_go",
-			"Rev": "2d5b3d6e6db42e361ca5a5b6376a1368f7067236"
+			"Rev": "13d5af9721f4455a501db543c93827447089bab3"
 		}
 	]
 }
