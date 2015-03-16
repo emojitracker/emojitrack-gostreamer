@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/garyburd/redigo/redis"
 	"log"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
 )
 
 // it'd be nice to get rid of this and just use redis.Message generic interface
@@ -63,22 +64,22 @@ func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
 	scoreUpdates := make(chan RedisMsg)
 	detailUpdates := make(chan RedisMsg)
 
-	// get a new redis connection from pool.
-	// since this is the first time the app tries to do something with redis,
-	// die if we can't get a valid connection, since something is probably
-	// configured wrong.
-	conn := redisPool.Get()
-	_, err := conn.Do("PING")
-	if err != nil {
-		log.Fatal("Could not connect to Redis, check your configuration.")
-	}
-
-	// subscribe to and handle streams
-	psc := redis.PubSubConn{conn}
-	psc.Subscribe("stream.score_updates")
-	psc.PSubscribe("stream.tweet_updates.*")
-
 	go func() {
+		// get a new redis connection from pool.
+		// since this is the first time the app tries to do something with redis,
+		// die if we can't get a valid connection, since something is probably
+		// configured wrong.
+		conn := redisPool.Get()
+		_, err := conn.Do("PING")
+		if err != nil {
+			log.Fatal("Could not connect to Redis, check your configuration.")
+		}
+
+		// subscribe to and handle streams
+		psc := redis.PubSubConn{conn}
+		psc.Subscribe("stream.score_updates")
+		psc.PSubscribe("stream.tweet_updates.*")
+
 		for {
 			switch v := psc.Receive().(type) {
 			case redis.Message:
@@ -90,12 +91,17 @@ func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
 				detailUpdates <- RedisMsg{v.Channel, v.Data}
 			case error:
 				log.Println("redis subscribe connection errored?@&*(#)akjd")
-				// probable cause is connection was closed, but force close just in case
+				// probable cause is connection was EOF
+				// reminder: in this context, "Close" means just return to pool
+				// pool will detect if connection is errored via testOnBorrow
 				conn.Close()
 
 				log.Println("attempting to get a new one in 5 seconds...")
 				time.Sleep(5 * time.Second)
 				conn = redisPool.Get()
+				psc = redis.PubSubConn{conn}
+				psc.Subscribe("stream.score_updates")
+				psc.PSubscribe("stream.tweet_updates.*")
 			}
 		}
 	}()
