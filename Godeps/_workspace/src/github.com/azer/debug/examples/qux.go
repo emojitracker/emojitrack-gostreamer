@@ -1,7 +1,7 @@
 package example
 
-import . "github.com/azer/debug"
+import . "github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/azer/debug"
 
-func Qux () {
+func Qux() {
 	Debug("keeps doing more work")
 }

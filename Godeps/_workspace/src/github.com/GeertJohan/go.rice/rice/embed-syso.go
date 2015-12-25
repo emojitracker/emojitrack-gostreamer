@@ -14,8 +14,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/GeertJohan/go.rice/embedded"
 	"github.com/akavel/rsrc/coff"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/GeertJohan/go.rice/embedded"
 )
 
 type sizedReader struct {

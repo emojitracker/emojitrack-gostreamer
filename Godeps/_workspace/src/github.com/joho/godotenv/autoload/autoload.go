@@ -8,7 +8,7 @@ package autoload
 	And bob's your mother's brother
 */
 
-import "github.com/joho/godotenv"
+import "github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/joho/godotenv"
 
 func init() {
 	_ = godotenv.Load()

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/daaku/go.zipexe"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/daaku/go.zipexe"
 )
 
 func operationAppend(pkgs []*build.Package) {

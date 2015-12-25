@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/GeertJohan/go.rice/embedded"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/GeertJohan/go.rice/embedded"
 )
 
 // For all test code in this package, define a set of test boxes.

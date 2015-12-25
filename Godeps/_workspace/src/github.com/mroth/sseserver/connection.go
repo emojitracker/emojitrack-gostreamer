@@ -1,7 +1,7 @@
 package sseserver
 
 import (
-	. "github.com/azer/debug"
+	. "github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/azer/debug"
 	"log"
 	"net/http"
 	"time"

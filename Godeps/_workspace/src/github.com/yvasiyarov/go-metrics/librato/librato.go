@@ -2,7 +2,7 @@ package librato
 
 import (
 	"fmt"
-	"github.com/yvasiyarov/go-metrics"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/yvasiyarov/go-metrics"
 	"log"
 	"math"
 	"regexp"

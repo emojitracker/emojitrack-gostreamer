@@ -1,8 +1,8 @@
 package sseserver
 
 import (
-	"github.com/GeertJohan/go.rice"
-	. "github.com/azer/debug"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/GeertJohan/go.rice"
+	. "github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/azer/debug"
 	"log"
 	"net/http"
 )

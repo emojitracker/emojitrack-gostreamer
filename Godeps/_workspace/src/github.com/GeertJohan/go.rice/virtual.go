@@ -8,7 +8,7 @@ import (
 	"sort"
 	"syscall"
 
-	"github.com/GeertJohan/go.rice/embedded"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/GeertJohan/go.rice/embedded"
 )
 
 //++ TODO: IDEA: merge virtualFile and virtualDir, this decreases work done by rice.File

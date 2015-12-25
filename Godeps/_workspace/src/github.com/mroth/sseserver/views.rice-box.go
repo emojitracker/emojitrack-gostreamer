@@ -1,7 +1,7 @@
 package sseserver
 
 import (
-	"github.com/GeertJohan/go.rice/embedded"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/GeertJohan/go.rice/embedded"
 	"time"
 )
 

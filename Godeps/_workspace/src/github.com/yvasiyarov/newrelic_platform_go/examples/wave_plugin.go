@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/yvasiyarov/newrelic_platform_go"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/yvasiyarov/newrelic_platform_go"
 )
 
 type WaveMetrica struct {

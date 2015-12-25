@@ -7,7 +7,7 @@ import (
 
 	"strings"
 
-	"github.com/joho/godotenv"
+	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/joho/godotenv"
 )
 
 func main() {

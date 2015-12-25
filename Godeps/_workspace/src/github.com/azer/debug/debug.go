@@ -1,23 +1,23 @@
 package debug
 
 import (
-	. "github.com/azer/go-style"
 	"fmt"
+	. "github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/azer/go-style"
 	"os"
 )
 
 var (
-	ctr int = 0
+	ctr   int    = 0
 	reset string = Style("reset", "")
 )
 
-func Debug ( text string, args ...interface{} ) {
+func Debug(text string, args ...interface{}) {
 	if len(enabled) == 0 {
 		return
 	}
 
 	name := caller()
-	if ! isEnabled(name) {
+	if !isEnabled(name) {
 		return
 	}
 
