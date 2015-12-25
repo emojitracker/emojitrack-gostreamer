@@ -8,9 +8,10 @@ Caveats
 -------
 ![noidea](http://static.someecards.com/someecards/usercards/MjAxMi0wZmYwN2ZiYmIyNzVkNzIy.png)
 
-This was my first major Go project, so there may potentially still be some dumb stuff left 
-in the code here.Please feel encouraged to send pull requests or line comments even for 
-idiomatic syntax issues when accompanied with an explanation that will help me learn.
+This was my first major Go project, so there may potentially still be some dumb
+stuff left in the code here.Please feel encouraged to send pull requests or line
+comments even for idiomatic syntax issues when accompanied with an explanation
+that will help me learn.
 
 Pipeline Flow
 -------------
@@ -24,20 +25,22 @@ Package sseserver
 -----------------
 This program doesn't actually do too much beyond the pipeline flow above, as all
 of the SSE/HTTP server logic has been extracted into a handy modular package
-that should be usable for any generic SSE broadcasting.  For that stuff, delve into the
-(freely licensed!) [sseserver](https://github.com/mroth/sseserver/) repo.
+that should be usable for any generic SSE broadcasting.  For that stuff, delve
+into the (freely licensed!) [sseserver](https://github.com/mroth/sseserver/)
+repo.
 
 Is it any fast?
 -----------
 Yes.:racehorse:
 
-TODO
-----
+Building the Docker container
+-----------------------------
+In order to keep container size minimal the build is done locally via Go >= 1.5
+cross-compilation toolchain instead of inside the container.  See the `Makefile`
+for details.
 
- - [x] move scorepacker and connectionpool into their own packages
- - [ ] possibly add tests for them even!
- - [x] handle redis server reconnects
- - [x] parse standard single `REDIS_URL` env var
- - [x] dont emit empty msgs (but lets wait until done benchmarking)
+The container build is not currently used in production on Heroku (and thus is
+not designed to produce Cedar-slug compatible builds), but exists for future
+migration potential.
 
 [1]: http://github.com/mroth/emojitrack-streamer-spec
