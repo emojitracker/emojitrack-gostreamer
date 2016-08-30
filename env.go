@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	_ "github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/joho/godotenv/autoload"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 // Handles loading configuration from environment.

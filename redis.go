@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/garyburd/redigo/redis"
+	"github.com/garyburd/redigo/redis"
 )
 
 // it'd be nice to get rid of this and just use redis.Message generic interface

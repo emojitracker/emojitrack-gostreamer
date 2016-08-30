@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/mroth/sseserver"
-	"github.com/mroth/emojitrack-gostreamer/Godeps/_workspace/src/github.com/yvasiyarov/gorelic"
+	"github.com/mroth/sseserver"
+	"github.com/yvasiyarov/gorelic"
 )
 
 // Handles reporting status of this application to external services.

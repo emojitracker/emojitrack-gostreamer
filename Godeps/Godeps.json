@@ -1,9 +1,14 @@
 {
 	"ImportPath": "github.com/mroth/emojitrack-gostreamer",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v74",
 	"Deps": [
 		{
 			"ImportPath": "github.com/GeertJohan/go.rice",
+			"Rev": "b4a18af231435326dd7995d2dd0f3ee31b81f212"
+		},
+		{
+			"ImportPath": "github.com/GeertJohan/go.rice/embedded",
 			"Rev": "b4a18af231435326dd7995d2dd0f3ee31b81f212"
 		},
 		{
@@ -28,6 +33,11 @@
 		},
 		{
 			"ImportPath": "github.com/joho/godotenv",
+			"Comment": "v1-2-gead2e75",
+			"Rev": "ead2e75027bf1a3f6457e28d9eb3c2fa05109d2b"
+		},
+		{
+			"ImportPath": "github.com/joho/godotenv/autoload",
 			"Comment": "v1-2-gead2e75",
 			"Rev": "ead2e75027bf1a3f6457e28d9eb3c2fa05109d2b"
 		},
