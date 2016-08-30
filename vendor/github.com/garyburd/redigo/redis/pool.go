@@ -46,7 +46,8 @@ var (
 //
 // The following example shows how to use a pool in a web application. The
 // application creates a pool at application startup and makes it available to
-// request handlers using a global variable.
+// request handlers using a global variable. The pool configuration used here
+// is an example, not a recommendation.
 //
 //  func newPool(server, password string) *redis.Pool {
 //      return &redis.Pool{
@@ -64,6 +65,9 @@ var (
 //              return c, err
 //          },
 //          TestOnBorrow: func(c redis.Conn, t time.Time) error {
+//              if time.Since(t) < time.Minute {
+//                  return nil
+//              }
 //              _, err := c.Do("PING")
 //              return err
 //          },
@@ -94,7 +98,10 @@ var (
 type Pool struct {
 
 	// Dial is an application supplied function for creating and configuring a
-	// connection
+	// connection.
+	//
+	// The connection returned from Dial must not be in a special state
+	// (subscribed to pubsub channel, transaction started, ...).
 	Dial func() (Conn, error)
 
 	// TestOnBorrow is an optional application supplied function for checking
@@ -116,7 +123,7 @@ type Pool struct {
 	// the timeout to a value less than the server's timeout.
 	IdleTimeout time.Duration
 
-	// If Wait is true and the pool is at the MaxIdle limit, then Get() waits
+	// If Wait is true and the pool is at the MaxActive limit, then Get() waits
 	// for a connection to be returned to the pool before returning.
 	Wait bool
 
@@ -135,8 +142,9 @@ type idleConn struct {
 	t time.Time
 }
 
-// NewPool creates a new pool. This function is deprecated. Applications should
-// initialize the Pool fields directly as shown in example.
+// NewPool creates a new pool.
+//
+// Deprecated: Initialize the Pool directory as shown in the example.
 func NewPool(newFn func() (Conn, error), maxIdle int) *Pool {
 	return &Pool{Dial: newFn, MaxIdle: maxIdle}
 }

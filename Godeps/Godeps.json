@@ -25,11 +25,13 @@
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
-			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
+			"Comment": "v1.0.0-5-gffa8d46",
+			"Rev": "ffa8d46ada782d81cfda81a0fbd9f45ceae448e8"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
-			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
+			"Comment": "v1.0.0-5-gffa8d46",
+			"Rev": "ffa8d46ada782d81cfda81a0fbd9f45ceae448e8"
 		},
 		{
 			"ImportPath": "github.com/joho/godotenv",
@@ -55,12 +57,12 @@
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/gorelic",
-			"Comment": "v0.0.6-14-gb355764",
-			"Rev": "b355764846b999a8a73fc426304f669de56a1a6d"
+			"Comment": "v0.0.6-44-gae09aa1",
+			"Rev": "ae09aa139a2b7f638e2412baceaceebd41eff115"
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/newrelic_platform_go",
-			"Rev": "13d5af9721f4455a501db543c93827447089bab3"
+			"Rev": "9c099fbc30e90de5bb5c5f94aa5fd08f2daeaacd"
 		}
 	]
 }
