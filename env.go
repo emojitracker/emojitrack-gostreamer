@@ -5,8 +5,6 @@ import (
 	"net/url"
 	"os"
 	"strings"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 // Handles loading configuration from environment.

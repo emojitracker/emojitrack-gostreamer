@@ -34,16 +34,6 @@
 			"Rev": "ffa8d46ada782d81cfda81a0fbd9f45ceae448e8"
 		},
 		{
-			"ImportPath": "github.com/joho/godotenv",
-			"Comment": "v1-2-gead2e75",
-			"Rev": "ead2e75027bf1a3f6457e28d9eb3c2fa05109d2b"
-		},
-		{
-			"ImportPath": "github.com/joho/godotenv/autoload",
-			"Comment": "v1-2-gead2e75",
-			"Rev": "ead2e75027bf1a3f6457e28d9eb3c2fa05109d2b"
-		},
-		{
 			"ImportPath": "github.com/kardianos/osext",
 			"Rev": "ccfcd0245381f0c94c68f50626665eed3c6b726a"
 		},
