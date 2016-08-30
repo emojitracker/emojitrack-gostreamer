@@ -1,27 +1,27 @@
 .PHONY: container publish serve serve-container clean
 
 app        := emojitrack-gostreamer
-linux-app  := build/linux-amd64/$(app)
+static-app := build/linux-amd64/$(app)
 docker-tag := emojitracker/gostreamer
 
-$(app): *.go
-	go build
+bin/$(app): *.go
+	go build -o $@
 
-$(linux-app):
-	env GOOS=linux GOARCH=amd64 go build -o $(linux-app)
+$(static-app): *.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+		go build -ldflags "-s" -a -installsuffix cgo -o $(static-app)
 
-container: $(linux-app)
+container: $(static-app)
 	docker build -t $(docker-tag) .
 
 publish: container
 	docker push $(docker-tag)
 
-serve: $(app)
-	env PATH=$(PATH):. forego start web
+serve: bin/$(app)
+	env PATH=$(PATH):./bin forego start web
 
 serve-container:
 	docker run -it --rm --env-file=.env -p 8001:8001 $(docker-tag)
 
 clean:
-	go clean
-	rm -rf build
+	rm -rf bin build
