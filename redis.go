@@ -76,19 +76,23 @@ func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
 		}
 
 		// subscribe to and handle streams
+		const scoreKey = "stream.score_updates"
+		const detailKey = "stream.tweet_updates.*"
 		psc := redis.PubSubConn{conn}
-		psc.Subscribe("stream.score_updates")
-		psc.PSubscribe("stream.tweet_updates.*")
+		psc.Subscribe(scoreKey)
+		psc.PSubscribe(detailKey)
 
 		for {
 			switch v := psc.Receive().(type) {
 			case redis.Message:
-				//fmt.Printf("%s: message: %s\n", v.Channel, v.Data)
-				scoreUpdates <- RedisMsg{v.Channel, v.Data} //string(v.Data)
-			case redis.PMessage:
-				//fmt.Printf("pattern: %s, channel: %s, data: %s\n", v.Pattern, v.Channel, v.Data)
-				//TODO: at some point we might need to also match the pattern here for kiosk mode
-				detailUpdates <- RedisMsg{v.Channel, v.Data}
+				switch {
+				case v.Channel == scoreKey:
+					scoreUpdates <- RedisMsg{v.Channel, v.Data}
+				case v.Pattern == detailKey:
+					detailUpdates <- RedisMsg{v.Channel, v.Data}
+				default:
+					log.Println("Received a message on an unexpected channel ", v.Channel)
+				}
 			case error:
 				log.Println("redis subscribe connection errored?@&*(#)akjd")
 				// probable cause is connection was EOF
