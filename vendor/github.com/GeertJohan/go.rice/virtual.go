@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"syscall"
 
 	"github.com/GeertJohan/go.rice/embedded"
 )
@@ -136,7 +135,7 @@ func (vf *virtualFile) seek(offset int64, whence int) (int64, error) {
 // virtualDir is only internally visible and should be exposed through rice.File
 type virtualDir struct {
 	*embedded.EmbeddedDir
-	offset int // readdir positon on the directory
+	offset int // readdir position on the directory
 	closed bool
 }
 
@@ -213,7 +212,7 @@ func (vd *virtualDir) readdir(n int) (fi []os.FileInfo, err error) {
 	if vd.offset+n >= len(files) {
 		offset := vd.offset
 		vd.offset = 0
-		return files[offset:len(files)], io.EOF
+		return files[offset:], io.EOF
 	}
 
 	offset := vd.offset
@@ -248,6 +247,6 @@ func (vd *virtualDir) seek(offset int64, whence int) (int64, error) {
 	return 0, &os.PathError{
 		Op:   "seek",
 		Path: vd.Filename,
-		Err:  syscall.EISDIR,
+		Err:  errors.New("is a directory"),
 	}
 }

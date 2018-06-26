@@ -2,12 +2,13 @@
 
 
 [[projects]]
+  branch = "master"
   name = "github.com/GeertJohan/go.rice"
   packages = [
     ".",
     "embedded"
   ]
-  revision = "b4a18af231435326dd7995d2dd0f3ee31b81f212"
+  revision = "c02ca9a983da5807ddf7d796784928f5be4afd09"
 
 [[projects]]
   branch = "master"
@@ -22,22 +23,25 @@
   revision = "14e31c5abbe5c10d3ea655bec860b312d2225f84"
 
 [[projects]]
+  branch = "master"
   name = "github.com/daaku/go.zipexe"
   packages = ["."]
-  revision = "4de5c18ca1fc5294fee64721094ca90c46d26405"
+  revision = "a5fe2436ffcb3236e175e5149162b41cd28bd27d"
 
 [[projects]]
-  name = "github.com/garyburd/redigo"
+  name = "github.com/gomodule/redigo"
   packages = [
     "internal",
     "redis"
   ]
-  revision = "ffa8d46ada782d81cfda81a0fbd9f45ceae448e8"
+  revision = "9c11da706d9b7902c6da69c592f75637793fe121"
+  version = "v2.0.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/kardianos/osext"
   packages = ["."]
-  revision = "ccfcd0245381f0c94c68f50626665eed3c6b726a"
+  revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
 
 [[projects]]
   name = "github.com/mroth/sseserver"
@@ -54,7 +58,8 @@
 [[projects]]
   name = "github.com/yvasiyarov/gorelic"
   packages = ["."]
-  revision = "ae09aa139a2b7f638e2412baceaceebd41eff115"
+  revision = "4dc1bb7ab951bc884feb2c009092b1a454152355"
+  version = "v0.0.6"
 
 [[projects]]
   branch = "master"
@@ -65,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4b168b594040bf565a56286d0b2773af812d681d7b60c543b4f7d83a069abb6a"
+  inputs-digest = "0f17d8e7e60dae73ea0bc4909e9d3d984d5531d5196dfc54bec25b04be376cf1"
   solver-name = "gps-cdcl"
   solver-version = 1

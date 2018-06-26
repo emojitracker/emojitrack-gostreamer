@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 )
 
 // it'd be nice to get rid of this and just use redis.Message generic interface

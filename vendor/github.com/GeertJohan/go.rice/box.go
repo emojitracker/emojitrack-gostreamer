@@ -67,6 +67,23 @@ func findBox(name string, order []LocateMethod) (*Box, error) {
 				continue
 			}
 			return b, nil
+		case LocateWorkingDirectory:
+			// resolve absolute directory path
+			err := b.resolveAbsolutePathFromWorkingDirectory()
+			if err != nil {
+				continue
+			}
+			// check if absolutePath exists on filesystem
+			info, err := os.Stat(b.absolutePath)
+			if err != nil {
+				continue
+			}
+			// check if absolutePath is actually a directory
+			if !info.IsDir() {
+				err = errors.New("given name/path is not a directory")
+				continue
+			}
+			return b, nil
 		}
 	}
 
@@ -105,6 +122,14 @@ var resolveAbsolutePathFromCaller = func(name string, nStackFrames int) (string,
 
 	// resolve to proper path
 	pkgDir := filepath.Dir(callingGoFile)
+	// fix for go cover
+	const coverPath = "_test/_obj_test"
+	if !filepath.IsAbs(pkgDir) {
+		if i := strings.Index(pkgDir, coverPath); i >= 0 {
+			pkgDir = pkgDir[:i] + pkgDir[i+len(coverPath):]            // remove coverPath
+			pkgDir = filepath.Join(os.Getenv("GOPATH"), "src", pkgDir) // make absolute
+		}
+	}
 	return filepath.Join(pkgDir, name), nil
 }
 
@@ -116,6 +141,15 @@ func (b *Box) resolveAbsolutePathFromCaller() error {
 	b.absolutePath = path
 	return nil
 
+}
+
+func (b *Box) resolveAbsolutePathFromWorkingDirectory() error {
+	path, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	b.absolutePath = filepath.Join(path, b.name)
+	return nil
 }
 
 // IsEmbedded indicates wether this box was embedded into the application
