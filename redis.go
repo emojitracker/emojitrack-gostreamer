@@ -78,7 +78,7 @@ func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
 		// subscribe to and handle streams
 		const scoreKey = "stream.score_updates"
 		const detailKey = "stream.tweet_updates.*"
-		psc := redis.PubSubConn{conn}
+		psc := redis.PubSubConn{Conn: conn}
 		psc.Subscribe(scoreKey)
 		psc.PSubscribe(detailKey)
 
@@ -103,7 +103,7 @@ func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
 				log.Println("attempting to get a new one in 5 seconds...")
 				time.Sleep(5 * time.Second)
 				conn = redisPool.Get()
-				psc = redis.PubSubConn{conn}
+				psc = redis.PubSubConn{Conn: conn}
 				psc.Subscribe("stream.score_updates")
 				psc.PSubscribe("stream.tweet_updates.*")
 			}
