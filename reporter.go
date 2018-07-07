@@ -31,15 +31,11 @@ func adminReporter(s *sseserver.Server) {
 }
 
 func gorelicMonitor() {
-
-	if envIsStaging() || envIsProduction() {
-		if key := os.Getenv("NEW_RELIC_LICENSE_KEY"); key != "" {
-			agent := gorelic.NewAgent()
-			agent.NewrelicName = "emojitrack-gostreamer"
-			agent.NewrelicLicense = key
-			agent.Verbose = false
-			agent.Run()
-		}
+	if key := os.Getenv("NEW_RELIC_LICENSE_KEY"); key != "" {
+		agent := gorelic.NewAgent()
+		agent.NewrelicName = "emojitrack-gostreamer"
+		agent.NewrelicLicense = key
+		agent.Verbose = false
+		agent.Run()
 	}
-
 }

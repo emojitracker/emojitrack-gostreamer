@@ -85,9 +85,13 @@ func main() {
 		}
 	}()
 
-	// start the monitor reporter to periodically send our status to redis
-	go adminReporter(s)
-	gorelicMonitor()
+	// monitoring in staging and production
+	if envIsStaging() || envIsProduction() {
+		// start the monitor reporter to periodically send our status to redis
+		go adminReporter(s)
+		// newrelic perf monitoring
+		gorelicMonitor()
+	}
 
 	// share and enjoy
 	port := envPort()
