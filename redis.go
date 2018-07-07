@@ -7,20 +7,6 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-// it'd be nice to get rid of this and just use redis.Message generic interface
-// ...but sigh Go: https://github.com/garyburd/redigo/issues/51
-//
-// let's just keep this and warp, even though there is some slight copy overhead
-// probably, but it's better than having to have to have the rest of the code
-// differentiate between structs based on where they originated.
-
-// RedisMsg is our wrapper around redis.Message and redis.PMessage, since they
-// really should be the same.
-type RedisMsg struct {
-	channel string
-	data    []byte
-}
-
 // direct copy from http://godoc.org/github.com/garyburd/redigo/redis#Pool
 // why do we need to cut and paste code instead of having it be built-in
 // to the package?  because golang!
@@ -58,11 +44,10 @@ func initRedisPool() {
 	redisPool = newPool(host, pass)
 }
 
-func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
-
+func myRedisSubscriptions() (<-chan redis.Message, <-chan redis.Message) {
 	// set up structures and channels to stream events out on
-	scoreUpdates := make(chan RedisMsg)
-	detailUpdates := make(chan RedisMsg)
+	scoreUpdates := make(chan redis.Message)
+	detailUpdates := make(chan redis.Message)
 
 	go func() {
 		// get a new redis connection from pool.
@@ -87,9 +72,9 @@ func myRedisSubscriptions() (<-chan RedisMsg, <-chan RedisMsg) {
 			case redis.Message:
 				switch {
 				case v.Channel == scoreKey:
-					scoreUpdates <- RedisMsg{v.Channel, v.Data}
+					scoreUpdates <- v
 				case v.Pattern == detailKey:
-					detailUpdates <- RedisMsg{v.Channel, v.Data}
+					detailUpdates <- v
 				default:
 					log.Println("Received a message on an unexpected channel ", v.Channel)
 				}

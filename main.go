@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gomodule/redigo/redis"
 	"github.com/mroth/sseserver"
 )
 
@@ -19,8 +20,8 @@ func main() {
 	scoreUpdates, detailUpdates := myRedisSubscriptions()
 
 	// fanout the scoreUpdates to two destinations
-	rawScoreUpdates := make(chan RedisMsg)
-	epsfeeder := make(chan RedisMsg)
+	rawScoreUpdates := make(chan redis.Message)
+	epsfeeder := make(chan redis.Message)
 	go func() {
 		for scoreUpdate := range scoreUpdates {
 			rawScoreUpdates <- scoreUpdate
@@ -39,7 +40,7 @@ func main() {
 	epsScoreUpdates := ScorePacker(scoreVals, time.Duration(17*time.Millisecond))
 	go func() {
 		for {
-			scoreVals <- string((<-epsfeeder).data)
+			scoreVals <- string((<-epsfeeder).Data)
 		}
 	}()
 
@@ -55,7 +56,7 @@ func main() {
 		for msg := range rawScoreUpdates {
 			clients <- sseserver.SSEMessage{
 				Event:     "",
-				Data:      msg.data,
+				Data:      msg.Data,
 				Namespace: "/raw",
 			}
 		}
@@ -75,11 +76,11 @@ func main() {
 	// detailPublisher
 	go func() {
 		for msg := range detailUpdates {
-			dchan := "/details/" + strings.Split(msg.channel, ".")[2]
+			dchan := "/details/" + strings.Split(msg.Channel, ".")[2]
 
 			clients <- sseserver.SSEMessage{
-				Event:     msg.channel,
-				Data:      msg.data,
+				Event:     msg.Channel,
+				Data:      msg.Data,
 				Namespace: dchan,
 			}
 		}
