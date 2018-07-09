@@ -7,42 +7,10 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-// direct copy from http://godoc.org/github.com/garyburd/redigo/redis#Pool
-// why do we need to cut and paste code instead of having it be built-in
-// to the package?  because golang!
-func newPool(server, password string) *redis.Pool {
-	return &redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", server)
-			if err != nil {
-				return nil, err
-			}
-			if password != "" {
-				if _, err := c.Do("AUTH", password); err != nil {
-					c.Close()
-					return nil, err
-				}
-			}
-			return c, err
-		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do("PING")
-			return err
-		},
-	}
-}
-
-// this should make a global var we can access wherever?
+// package scoped vars we can access wherever
 var (
 	redisPool *redis.Pool
 )
-
-func initRedisPool() {
-	host, pass := envRedis()
-	redisPool = newPool(host, pass)
-}
 
 func myRedisSubscriptions() (<-chan redis.Message, <-chan redis.Message) {
 	// set up structures and channels to stream events out on
@@ -50,10 +18,9 @@ func myRedisSubscriptions() (<-chan redis.Message, <-chan redis.Message) {
 	detailUpdates := make(chan redis.Message)
 
 	go func() {
-		// get a new redis connection from pool.
-		// since this is the first time the app tries to do something with redis,
-		// die if we can't get a valid connection, since something is probably
-		// configured wrong.
+		// Get a new Redis connection from pool. Since this is the first time
+		// the app tries to do something with Redis, die if we can't get a valid
+		// connection, since something is probably configured wrong.
 		conn := redisPool.Get()
 		_, err := conn.Do("PING")
 		if err != nil {
@@ -96,4 +63,34 @@ func myRedisSubscriptions() (<-chan redis.Message, <-chan redis.Message) {
 	}()
 
 	return scoreUpdates, detailUpdates
+}
+
+// https://godoc.org/github.com/gomodule/redigo/redis#Pool
+func newPool(server, password string) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", server)
+			if err != nil {
+				return nil, err
+			}
+			if password != "" {
+				if _, err := c.Do("AUTH", password); err != nil {
+					c.Close()
+					return nil, err
+				}
+			}
+			return c, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			return err
+		},
+	}
+}
+
+func initRedisPool() {
+	host, pass := envRedis()
+	redisPool = newPool(host, pass)
 }
