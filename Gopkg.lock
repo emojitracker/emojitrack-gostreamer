@@ -46,8 +46,8 @@
 [[projects]]
   name = "github.com/mroth/sseserver"
   packages = ["."]
-  revision = "19484734a97ce2201d04989a667463a68f63992f"
-  version = "v1.0.0"
+  revision = "c638473c201d75ee40680a16c575ad3064197d6c"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
@@ -69,6 +69,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f3e9b5f7475b324fd7c573e7df7a1fc4b891ae16df8fee7f637654f3aab74014"
+  inputs-digest = "6d2c39deb3909edd0c5f9f47853bdf907cf412e2faf86fb2fb5e131b51844b88"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,1 +1,1 @@
-web: emojitrack-gostreamer
+web: bin/emojitrack-gostreamer
