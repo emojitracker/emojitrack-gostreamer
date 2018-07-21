@@ -9,7 +9,7 @@ the [Emojitracker Streaming API Specification][1] in Go.
 Caveats
 -------
 
-This was oriiginally my first major Go project, so there may potentially still
+This was originally my first major Go project, so there may potentially still
 be some silly stuff left in the code here. Please feel encouraged to send pull
 requests or line comments even for idiomatic syntax issues when accompanied with
 an explanation that will help me learn!
