@@ -1,0 +1,24 @@
+version: '2'
+services:
+  stream-api:
+    build: .
+    image: emojitracker/gostreamer
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+      - feeder
+
+  feeder:
+    image: emojitracker/fakefeeder
+    command: ["-target=redis://redis:6379", "-rate=250"]
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
