@@ -4,15 +4,13 @@ emojitrack-gostreamer
 Implementation of an API compatible server for
 the [Emojitracker Streaming API Specification][1] in Go.
 
-[![Docker Build Status](https://img.shields.io/docker/build/emojitracker/gostreamer.svg?style=flat-square)](https://hub.docker.com/r/emojitracker/gostreamer/)
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/emojitracker/gostreamer.svg?style=flat-square)](https://hub.docker.com/r/emojitracker/gostreamer/)
 
 Caveats
 -------
 
 This was originally my first major Go project, so there may potentially still
-be some silly stuff left in the code here. Please feel encouraged to send pull
-requests or line comments even for idiomatic syntax issues when accompanied with
-an explanation that will help me learn!
+be some silly stuff left in the code here.
 
 Pipeline Flow
 -------------
