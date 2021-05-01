@@ -2,11 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"time"
 
 	"github.com/mroth/sseserver"
-	"github.com/yvasiyarov/gorelic"
 )
 
 // Handles reporting status of this node to our stats block in Redis
@@ -27,15 +25,4 @@ func adminReporter(s *sseserver.Server) {
 			rc.Close()
 		}
 	}()
-}
-
-// Runs the vendor package for reporting to New Relic
-func gorelicMonitor() {
-	if key := os.Getenv("NEW_RELIC_LICENSE_KEY"); key != "" {
-		agent := gorelic.NewAgent()
-		agent.NewrelicName = "emojitrack-gostreamer"
-		agent.NewrelicLicense = key
-		agent.Verbose = false
-		agent.Run()
-	}
 }

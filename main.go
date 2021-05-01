@@ -82,7 +82,6 @@ func main() {
 	// monitoring in staging and production
 	if envIsStaging() || envIsProduction() {
 		adminReporter(s) // periodically reports stats on node status into redis
-		gorelicMonitor() // newrelic perf monitoring
 	}
 
 	// share and enjoy
