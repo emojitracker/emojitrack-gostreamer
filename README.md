@@ -30,6 +30,28 @@ that should be usable for any generic SSE broadcasting.  For that stuff, delve
 into the (freely licensed!) [sseserver](https://github.com/mroth/sseserver/)
 repo.
 
+
+Development
+-----------
+
+A sandbox environment is provided to test via Docker Compose, using
+[emojitrack/fakefeeder](https://github.com/emojitracker/emojitrack-fakefeeder)
+to simulate production traffic.
+
+Simply run `docker compose up` and you'll have a local environment to test
+against, with the streamer exposed on port 8001. Try `curl
+http://localhost:8001/subscribe/eps` for example.
+
+Production
+----------
+
+Currently handled on Heroku, to add remotes manually after cloning the repository:
+
+    heroku git:remote --remote production emojitrack-gostreamer
+    heroku git:remote --remote staging emojitrack-gostreamer-staging
+
+Simply git pushing to either will build and update.
+
 Is it any fast?
 ---------------
 
